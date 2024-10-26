@@ -30,6 +30,8 @@ defaultContentLanguage = "en"
     { icon = "github", link = "https://github.com/shaorui0" },
     { icon = "linkedin", link = "https://www.linkedin.com/in/your-linkedin-profile" }
   ]
+  darkMode = true
+  customCSS = ["css/custom.css"]
 
 [menu]
   [[menu.main]]
