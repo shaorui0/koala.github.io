@@ -11,5 +11,5 @@ git push origin hexo
 # Generate static files
 hexo clean && hexo generate && hexo deploy
 
-cd /blog-original/ && hexo clean && hexo generate && hexo deploy
+# cd /blog-original/ && hexo clean && hexo generate && hexo deploy
 # hexo new post "test"
