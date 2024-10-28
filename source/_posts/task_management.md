@@ -2,6 +2,7 @@
 title: Comprehensive Task Management and Prioritization Methodologies
 date: 2024-10-28 11:00:00
 tags: [task management, prioritization]
+mathjax: true
 ---
 <!-- # Comprehensive Task Management and Prioritization Methodologies -->
 
@@ -70,8 +71,9 @@ A scoring system to prioritize tasks based on multiple factors.
 
 ### RICE Score Calculation
 $$
-\text{RICE Score} = \frac{\text{Reach} \times \text{Impact} \times \text{Confidence}}{\text{Effort}}
+\text{RICE Score} = \frac{\text{Reach} \cdot \text{Impact} \cdot \text{Confidence}}{\text{Effort}}
 $$
+
 
 
 **Higher RICE scores** indicate higher priority tasks.
