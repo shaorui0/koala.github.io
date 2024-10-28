@@ -69,7 +69,9 @@ A scoring system to prioritize tasks based on multiple factors.
 | **Effort**      | The amount of resources required to complete the task.              |
 
 ### RICE Score Calculation
+$$ 
 \[ \text{RICE Score} = \frac{\text{Reach} \times \text{Impact} \times \text{Confidence}}{\text{Effort}} \]
+$$
 
 **Higher RICE scores** indicate higher priority tasks.
 
