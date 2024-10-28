@@ -1,40 +1,44 @@
 ---
-title: My First Post
-date: 2024-10-27 10:00:00
-tags: [example, tutorial]
+title: Tiktok in Golang 
+date: 2024-10-28 10:00:00
+tags: [goroutine, golang]
 ---
-Welcome to [Hexo](https://hexo.io/)! This is your very first post. Check [documentation](https://hexo.io/docs/) for more info. If you get any problems when using Hexo, you can find the answer in [troubleshooting](https://hexo.io/docs/troubleshooting.html) or you can ask me on [GitHub](https://github.com/hexojs/hexo/issues).
 
-## Quick Start
+```go
+package main
 
-### Create a new post
+import (
+	"fmt"
+	"time"
+)
 
-``` bash
-$ hexo new "My New Post"
+func main() {
+	// Create a channel for synchronization
+	tikTokChan := make(chan bool)
+
+	// Start the goroutine for "tik"
+	go func() {
+		for {
+			fmt.Println("tik")
+			time.Sleep(1 * time.Second) // Wait for 1 second
+			tikTokChan <- true          // Signal the "tok" goroutine
+			<-tikTokChan                // Wait for the "tok" goroutine
+		}
+	}()
+
+	time.Sleep(1 * time.Second)
+	// Start the goroutine for "tok"
+	go func() {
+		for {
+			<-tikTokChan                // Wait for the "tik" goroutine
+			fmt.Println("tok")
+			time.Sleep(1 * time.Second) // Wait for 1 second
+			tikTokChan <- true          // Signal the "tik" goroutine
+		}
+	}()
+
+	// Use a channel to wait indefinitely or until the program is terminated
+	forever := make(chan bool)
+	<-forever
+}
 ```
-
-More info: [Writing](https://hexo.io/docs/writing.html)
-
-### Run server
-
-``` bash
-$ hexo server
-```
-
-More info: [Server](https://hexo.io/docs/server.html)
-
-### Generate static files
-
-``` bash
-$ hexo generate
-```
-
-More info: [Generating](https://hexo.io/docs/generating.html)
-
-### Deploy to remote sites
-
-``` bash
-$ hexo deploy
-```
-
-More info: [Deployment](https://hexo.io/docs/one-command-deployment.html)
