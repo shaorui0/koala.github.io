@@ -19,6 +19,8 @@ The **Important-Urgent Matrix** helps in categorizing tasks based on their urgen
 | **Important**    | **Quadrant I: Do First**            | **Quadrant II: Schedule**       |
 | **Not Important**| **Quadrant III: Delegate**          | **Quadrant IV: Eliminate**      |
 
+<!-- more -->
+
 ### Quadrant Descriptions
 - **Quadrant I: Do First**  
   Tasks that are both important and urgent. These require immediate attention.
