@@ -110,6 +110,9 @@ menu:
   home: /
   archives: /archives
   tags: /tags
+  thoughts: /categories/Thoughts/
+  categories: /categories
+
 # Social Links (Global)
 social:
   github: https://github.com/your-username
