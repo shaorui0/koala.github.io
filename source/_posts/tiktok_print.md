@@ -1,5 +1,5 @@
 ---
-title: Tiktok in Golang 
+title: Tiktok print in Golang 
 date: 2024-10-28 10:00:00
 tags: [goroutine, golang]
 ---
