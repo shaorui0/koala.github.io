@@ -126,3 +126,6 @@ tag_generator:
 mermaid:
   enable: true
   version: "10.0.2"  # Specify Mermaid version (optional)
+
+pandoc:
+  pandoc_path: "/usr/bin/pandoc"  # Update this path to where pandoc is installed
