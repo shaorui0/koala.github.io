@@ -180,7 +180,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2024-10-28 11:00:00 / Modified: 22:22:26" itemprop="dateCreated datePublished" datetime="2024-10-28T11:00:00+08:00">2024-10-28</time>
+              <time title="Created: 2024-10-28 11:00:00 / Modified: 22:30:27" itemprop="dateCreated datePublished" datetime="2024-10-28T11:00:00+08:00">2024-10-28</time>
             </span>
 
           
@@ -284,7 +284,7 @@
 <td>The amount of resources required to complete the task.</td>
 </tr>
 </tbody></table>
-<h3 id="RICE-Score-Calculation"><a href="#RICE-Score-Calculation" class="headerlink" title="RICE Score Calculation"></a>RICE Score Calculation</h3><p>[ \text{RICE Score} = \frac{\text{Reach} \times \text{Impact} \times \text{Confidence}}{\text{Effort}} ]</p>
+<h3 id="RICE-Score-Calculation"><a href="#RICE-Score-Calculation" class="headerlink" title="RICE Score Calculation"></a>RICE Score Calculation</h3><p>$$<br>[ \text{RICE Score} = \frac{\text{Reach} \times \text{Impact} \times \text{Confidence}}{\text{Effort}} ]<br>$$</p>
 <p><strong>Higher RICE scores</strong> indicate higher priority tasks.</p>
 <hr>
 <h2 id="5-ABCDE-Method"><a href="#5-ABCDE-Method" class="headerlink" title="5. ABCDE Method"></a>5. ABCDE Method</h2><p>A categorization system to prioritize tasks based on their consequences.</p>
@@ -366,7 +366,12 @@
 <li><strong>Elevate Bottleneck:</strong> Increase the capacity of the bottleneck through additional resources or process improvements.</li>
 <li><strong>Repeat:</strong> Once the current bottleneck is resolved, identify the next one and continue the process.</li>
 </ol>
-<h3 id="Pipeline-Diagram"><a href="#Pipeline-Diagram" class="headerlink" title="Pipeline Diagram"></a>Pipeline Diagram</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">flowchart TD</span><br><span class="line">    A[Identify Bottleneck] --&gt; B[Exploit Bottleneck]</span><br><span class="line">    B --&gt; C[Subordinate to Bottleneck]</span><br><span class="line">    C --&gt; D[Elevate Bottleneck]</span><br><span class="line">    D --&gt; E[Identify Next Bottleneck]</span><br><span class="line">    E --&gt; A</span><br></pre></td></tr></table></figure>
+<h3 id="Pipeline-Diagram"><a href="#Pipeline-Diagram" class="headerlink" title="Pipeline Diagram"></a>Pipeline Diagram</h3><pre class="mermaid">flowchart TD
+    A[Identify Bottleneck] --> B[Exploit Bottleneck]
+    B --> C[Subordinate to Bottleneck]
+    C --> D[Elevate Bottleneck]
+    D --> E[Identify Next Bottleneck]
+    E --> A</pre>
 
 
 <h2 id="Summary"><a href="#Summary" class="headerlink" title="Summary"></a>Summary</h2><p>By integrating these methodologies, you can create a robust system for task management and prioritization. Here’s a quick reference table to compare the different methods:</p>
@@ -680,6 +685,8 @@
 
 
 
+
+  
 
   
 
