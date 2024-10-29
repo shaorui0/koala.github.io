@@ -1,5 +1,5 @@
 ---
-title: Loki Introduction
+title: Loki System Scalability
 date: 2024-10-29 21:40:00
 tags: [loki, log]
 ---
