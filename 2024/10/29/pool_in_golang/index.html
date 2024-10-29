@@ -20,21 +20,21 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="123456789101112131415161718192021222324252627282930313233343536package mainimport (	&quot;fmt&quot;	&quot;time&quot;)func main() &amp;#123;	&#x2F;&#x2F; Create a channel for synchronization	tikTokChan :&#x3D; make(chan">
+  <meta name="description" content="1. Understanding the Purpose of Each Pool Connection Pool  What it does: Manages the number of active connections. Purpose:  Ensures the server doesn’t get overwhelmed by too many concurrent client co">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Tiktok print in Golang">
-<meta property="og:url" content="http://example.com/2024/10/28/tiktok_print_in_golang/index.html">
+<meta property="og:title" content="Pooling in Golang">
+<meta property="og:url" content="http://example.com/2024/10/29/pool_in_golang/index.html">
 <meta property="og:site_name" content="Justin Shao&#39;s Space">
-<meta property="og:description" content="123456789101112131415161718192021222324252627282930313233343536package mainimport (	&quot;fmt&quot;	&quot;time&quot;)func main() &amp;#123;	&#x2F;&#x2F; Create a channel for synchronization	tikTokChan :&#x3D; make(chan">
+<meta property="og:description" content="1. Understanding the Purpose of Each Pool Connection Pool  What it does: Manages the number of active connections. Purpose:  Ensures the server doesn’t get overwhelmed by too many concurrent client co">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2024-10-28T02:00:00.000Z">
-<meta property="article:modified_time" content="2024-10-28T14:12:14.062Z">
+<meta property="article:published_time" content="2024-10-29T12:57:00.000Z">
+<meta property="article:modified_time" content="2024-10-29T12:58:06.534Z">
 <meta property="article:author" content="Justin Shao">
 <meta property="article:tag" content="golang">
-<meta property="article:tag" content="goroutine">
+<meta property="article:tag" content="pooling">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2024/10/28/tiktok_print_in_golang/">
+<link rel="canonical" href="http://example.com/2024/10/29/pool_in_golang/">
 
 
 <script id="page-configurations">
@@ -47,7 +47,7 @@
   };
 </script>
 
-  <title>Tiktok print in Golang | Justin Shao's Space</title>
+  <title>Pooling in Golang | Justin Shao's Space</title>
   
 
 
@@ -162,7 +162,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/28/tiktok_print_in_golang/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/pool_in_golang/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -175,7 +175,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Tiktok print in Golang
+          Pooling in Golang
         </h1>
 
         <div class="post-meta">
@@ -186,7 +186,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2024-10-28 10:00:00 / Modified: 22:12:14" itemprop="dateCreated datePublished" datetime="2024-10-28T10:00:00+08:00">2024-10-28</time>
+              <time title="Created: 2024-10-29 20:57:00 / Modified: 20:58:06" itemprop="dateCreated datePublished" datetime="2024-10-29T20:57:00+08:00">2024-10-29</time>
             </span>
 
           
@@ -200,7 +200,179 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Create a channel for synchronization</span></span><br><span class="line">	tikTokChan := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Start the goroutine for &quot;tik&quot;</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			fmt.Println(<span class="string">&quot;tik&quot;</span>)</span><br><span class="line">			time.Sleep(<span class="number">1</span> * time.Second) <span class="comment">// Wait for 1 second</span></span><br><span class="line">			tikTokChan &lt;- <span class="literal">true</span>          <span class="comment">// Signal the &quot;tok&quot; goroutine</span></span><br><span class="line">			&lt;-tikTokChan                <span class="comment">// Wait for the &quot;tok&quot; goroutine</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	<span class="comment">// Start the goroutine for &quot;tok&quot;</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			&lt;-tikTokChan                <span class="comment">// Wait for the &quot;tik&quot; goroutine</span></span><br><span class="line">			fmt.Println(<span class="string">&quot;tok&quot;</span>)</span><br><span class="line">			time.Sleep(<span class="number">1</span> * time.Second) <span class="comment">// Wait for 1 second</span></span><br><span class="line">			tikTokChan &lt;- <span class="literal">true</span>          <span class="comment">// Signal the &quot;tik&quot; goroutine</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Use a channel to wait indefinitely or until the program is terminated</span></span><br><span class="line">	forever := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>)</span><br><span class="line">	&lt;-forever</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+        <h2 id="understanding-the-purpose-of-each-pool"><strong>1. Understanding the Purpose of Each Pool</strong></h2>
+<h3 id="connection-pool"><strong>Connection Pool</strong></h3>
+<ul>
+<li><strong>What it does</strong>: Manages the number of <strong>active connections</strong>.</li>
+<li><strong>Purpose</strong>:
+<ul>
+<li>Ensures the server doesn’t get overwhelmed by too many concurrent client connections.</li>
+<li>Helps <strong>limit resource consumption</strong> (e.g., file descriptors, memory).</li>
+</ul></li>
+<li><strong>When to use</strong>:
+<ul>
+<li>When you expect <strong>high client concurrency</strong> (many clients connecting simultaneously).</li>
+</ul></li>
+</ul>
+<h3 id="goroutine-pool-worker-pool"><strong>Goroutine Pool (Worker Pool)</strong></h3>
+<ul>
+<li><strong>What it does</strong>: Limits the <strong>number of concurrent tasks</strong> (i.e., goroutines) for processing data.</li>
+<li><strong>Purpose</strong>:
+<ul>
+<li>Avoids <strong>goroutine explosion</strong>, where too many goroutines are created and overuse CPU/memory.</li>
+<li>Helps keep the system <strong>stable under heavy load</strong> by reusing workers.</li>
+</ul></li>
+<li><strong>When to use</strong>:
+<ul>
+<li>When each connection streams <strong>many messages</strong>, and <strong>each message needs to be processed</strong> by a worker thread (goroutine).</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="which-pool-do-you-need"><strong>2. Which Pool Do You Need?</strong></h2>
+<h3 id="scenario-analysis-client-streaming-grpc"><strong>Scenario Analysis: Client Streaming gRPC</strong></h3>
+<ol type="1">
+<li><strong>High number of concurrent client connections</strong>:
+<ul>
+<li>If <strong>many clients</strong> will open <strong>simultaneous streaming connections</strong>, you need a <strong>connection pool</strong> to <strong>limit active connections</strong>.</li>
+<li>Without a connection pool, the server could get overwhelmed by too many open connections, causing resource exhaustion.</li>
+</ul></li>
+<li><strong>High-frequency message streams from each client</strong>:
+<ul>
+<li>If each <strong>client connection streams many messages</strong> (e.g., metrics every second), <strong>goroutine reuse</strong> (worker pool) is important to <strong>avoid spawning a new goroutine for every message</strong>.</li>
+<li>This prevents <strong>excessive context switching</strong> and <strong>memory pressure</strong> from thousands of active goroutines.</li>
+</ul></li>
+</ol>
+<hr />
+<h3 id="decision-when-to-use-one-or-both"><strong>Decision: When to Use One or Both</strong></h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Case</strong></th>
+<th><strong>Use Connection Pool?</strong></th>
+<th><strong>Use Goroutine Pool?</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>High <strong>number of concurrent clients</strong></td>
+<td>✅ Yes</td>
+<td>Optional (if message processing is lightweight)</td>
+</tr>
+<tr class="even">
+<td>High <strong>frequency of streamed messages</strong> per client</td>
+<td>❌ No (if clients are few)</td>
+<td>✅ Yes, to avoid goroutine explosion</td>
+</tr>
+<tr class="odd">
+<td>Both <strong>many clients</strong> and <strong>frequent messages</strong></td>
+<td>✅ Yes</td>
+<td>✅ Yes</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="recommended-approach-for-your-case"><strong>3. Recommended Approach for Your Case</strong></h3>
+<p>Since your scenario involves <strong>client streaming of metrics</strong>, where clients send frequent messages (e.g., <strong>one message per second</strong>) and potentially many clients may connect:</p>
+<ul>
+<li><strong>You need both</strong> a <strong>connection pool</strong> and <strong>goroutine pool</strong>:
+<ul>
+<li><strong>Connection Pool</strong>: Limits the number of simultaneous client connections.</li>
+<li><strong>Goroutine Pool (Worker Pool)</strong>: Ensures efficient reuse of goroutines for <strong>processing each message</strong> from the stream.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="implementation-strategy"><strong>4. Implementation Strategy</strong></h2>
+<p>You can <strong>combine both the connection pool and goroutine pool</strong> as shown below:</p>
+<ul>
+<li><strong>Connection Pool</strong>: Limits concurrent client connections.</li>
+<li><strong>Worker Pool</strong>: Handles the processing of individual metrics efficiently.</li>
+</ul>
+<h2 id="recommended-pool-sizes-based-on-typical-5g-scenarios"><strong>2. Recommended Pool Sizes Based on Typical 5G Scenarios</strong></h2>
+<p>Given the scale of <strong>5G metrics collection</strong>, here are <strong>ballpark numbers</strong> for <strong>pool sizes</strong>:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Metric</strong></th>
+<th><strong>Typical Number</strong></th>
+<th><strong>Explanation</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Concurrent Connections (Connection Pool)</strong></td>
+<td><strong>100–1,000</strong></td>
+<td>Each gNodeB, IoT device, or base station may open a stream to send metrics.</td>
+</tr>
+<tr class="even">
+<td><strong>Goroutine Pool Size (Worker Pool)</strong></td>
+<td><strong>2× to 5× the CPU core count</strong> (e.g., 32–64)</td>
+<td>Depends on the processing load. More workers help if the workload is CPU-bound.</td>
+</tr>
+<tr class="odd">
+<td><strong>Message Queue Buffer Size</strong></td>
+<td><strong>10,000+</strong> messages</td>
+<td>Buffer to handle bursts and avoid blocking if workers are busy.</td>
+</tr>
+<tr class="even">
+<td><strong>Message Frequency</strong></td>
+<td><strong>1–10 messages per second per client</strong></td>
+<td>Example: Metrics reporting at high frequency from each base station.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="recommended-pool-sizes-based-on-typical-5g-scenarios-1"><strong>5. Recommended Pool Sizes Based on Typical 5G Scenarios</strong></h2>
+<p>Given the scale of <strong>5G metrics collection</strong>, here are <strong>ballpark numbers</strong> for <strong>pool sizes</strong>:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Metric</strong></th>
+<th><strong>Typical Number</strong></th>
+<th><strong>Explanation</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Concurrent Connections (Connection Pool)</strong></td>
+<td><strong>100–1,000</strong></td>
+<td>Each gNodeB, IoT device, or base station may open a stream to send metrics.</td>
+</tr>
+<tr class="even">
+<td><strong>Goroutine Pool Size (Worker Pool)</strong></td>
+<td><strong>2× to 5× the CPU core count</strong> (e.g., 32–64)</td>
+<td>Depends on the processing load. More workers help if the workload is CPU-bound.</td>
+</tr>
+<tr class="odd">
+<td><strong>Message Queue Buffer Size</strong></td>
+<td><strong>10,000+</strong> messages</td>
+<td>Buffer to handle bursts and avoid blocking if workers are busy.</td>
+</tr>
+<tr class="even">
+<td><strong>Message Frequency</strong></td>
+<td><strong>1–10 messages per second per client</strong></td>
+<td>Example: Metrics reporting at high frequency from each base station.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reference">Reference</h2>
+<p><a target="_blank" rel="noopener" href="https://github.com/shaorui0/recipes/blob/main/pool/conn_client_pool.go">[Code snippet] Connection pool in client side</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/shaorui0/recipes/blob/main/pool/conn_serv_pool.go">[Code snippet] Connection pool in server side</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/shaorui0/recipes/blob/main/pool/obj_pool.go">[Code snippet] Object pool</a></p>
 
     </div>
 
@@ -211,7 +383,7 @@
       <footer class="post-footer">
           <div class="post-tags">
               <a href="/tags/golang/" rel="tag"># golang</a>
-              <a href="/tags/goroutine/" rel="tag"># goroutine</a>
+              <a href="/tags/pooling/" rel="tag"># pooling</a>
           </div>
 
         
@@ -219,10 +391,13 @@
 
         
     <div class="post-nav">
-      <div class="post-nav-item"></div>
       <div class="post-nav-item">
-    <a href="/2024/10/28/task_management/" rel="next" title="Comprehensive Task Management and Prioritization Methodologies">
-      Comprehensive Task Management and Prioritization Methodologies <i class="fa fa-chevron-right"></i>
+    <a href="/2024/10/28/task_management/" rel="prev" title="Comprehensive Task Management and Prioritization Methodologies">
+      <i class="fa fa-chevron-left"></i> Comprehensive Task Management and Prioritization Methodologies
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/10/29/goroutine_leak/" rel="next" title="Goroutine Leaks">
+      Goroutine Leaks <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -282,6 +457,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#understanding-the-purpose-of-each-pool"><span class="nav-number">1.</span> <span class="nav-text">1. Understanding the Purpose of Each Pool</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#connection-pool"><span class="nav-number">1.1.</span> <span class="nav-text">Connection Pool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#goroutine-pool-worker-pool"><span class="nav-number">1.2.</span> <span class="nav-text">Goroutine Pool (Worker Pool)</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#which-pool-do-you-need"><span class="nav-number">2.</span> <span class="nav-text">2. Which Pool Do You Need?</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#scenario-analysis-client-streaming-grpc"><span class="nav-number">2.1.</span> <span class="nav-text">Scenario Analysis: Client Streaming gRPC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#decision-when-to-use-one-or-both"><span class="nav-number">2.2.</span> <span class="nav-text">Decision: When to Use One or Both</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#recommended-approach-for-your-case"><span class="nav-number">2.3.</span> <span class="nav-text">3. Recommended Approach for Your Case</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#implementation-strategy"><span class="nav-number">3.</span> <span class="nav-text">4. Implementation Strategy</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#recommended-pool-sizes-based-on-typical-5g-scenarios"><span class="nav-number">4.</span> <span class="nav-text">2. Recommended Pool Sizes Based on Typical 5G Scenarios</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#recommended-pool-sizes-based-on-typical-5g-scenarios-1"><span class="nav-number">5.</span> <span class="nav-text">5. Recommended Pool Sizes Based on Typical 5G Scenarios</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reference"><span class="nav-number">6.</span> <span class="nav-text">Reference</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

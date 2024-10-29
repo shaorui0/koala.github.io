@@ -155,6 +155,550 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/golang_syntax_questions/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/10/29/golang_syntax_questions/" class="post-title-link" itemprop="url">Golang Interview Questions</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-10-29 20:57:00 / Modified: 20:59:03" itemprop="dateCreated datePublished" datetime="2024-10-29T20:57:00+08:00">2024-10-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>In an interview for a Go (Golang) developer position, you can expect questions that delve deep into the language's core features and idioms. Here are some key points and potential questions an interviewer might ask:</p>
+<h3 id="concurrency">1. <strong>Concurrency</strong></h3>
+<ul>
+<li><strong>Goroutines:</strong>
+<ul>
+<li>How do goroutines work in Go?</li>
+<li>What happens if a goroutine panics? How can you handle it?</li>
+<li>Can you explain how to manage goroutines to avoid memory leaks or excessive resource usage?</li>
+</ul></li>
+<li><strong>Channels:</strong>
+<ul>
+<li>How do channels facilitate communication between goroutines? Can you provide an example?</li>
+<li>What is the difference between buffered and unbuffered channels? When would you use each?</li>
+<li>How would you implement a worker pool using goroutines and channels?</li>
+<li>Explain the concept of channel direction and how it’s used in Go.</li>
+<li>How do you handle channel closing, and what are the implications of closing a channel?</li>
+</ul></li>
+</ul>
+<h3 id="http-operations">2. <strong>HTTP Operations</strong></h3>
+<ul>
+<li><strong>HTTP Servers:</strong>
+<ul>
+<li>How do you set up an HTTP server in Go?</li>
+<li>Can you describe how to handle different HTTP methods (GET, POST, PUT, DELETE) in Go?</li>
+<li>How do you handle request context and cancellation in an HTTP server?</li>
+</ul></li>
+<li><strong>HTTP Clients:</strong>
+<ul>
+<li>How do you perform HTTP requests in Go using the <code>net/http</code> package?</li>
+<li>How would you handle timeouts and retries when making HTTP requests?</li>
+<li>Can you explain how to manage cookies, headers, and authentication in HTTP requests?</li>
+</ul></li>
+</ul>
+<h3 id="channels">3. <strong>Channels</strong></h3>
+<ul>
+<li><strong>Channel Operations:</strong>
+<ul>
+<li>How do you use <code>select</code> with channels in Go? Can you provide an example?</li>
+<li>What are common pitfalls when working with channels?</li>
+<li>Explain how to use channels for synchronization between goroutines.</li>
+</ul></li>
+<li><strong>Advanced Channel Usage:</strong>
+<ul>
+<li>How can you implement a publish-subscribe pattern using channels?</li>
+<li>How do you implement a rate limiter using channels in Go?</li>
+</ul></li>
+</ul>
+<h3 id="data-structures-usage">4. <strong>Data Structures Usage</strong></h3>
+<ul>
+<li><strong>Maps:</strong>
+<ul>
+<li>How do you work with maps in Go? What are their limitations?</li>
+<li>How would you handle concurrent access to a map?</li>
+</ul></li>
+<li><strong>Slices:</strong>
+<ul>
+<li>How do slices differ from arrays in Go?</li>
+<li>Can you explain how slices are internally implemented and how that affects their usage?</li>
+<li>What are some common slice operations, and how do you handle out-of-bounds errors?</li>
+</ul></li>
+<li><strong>Structs:</strong>
+<ul>
+<li>How do you define and use structs in Go?</li>
+<li>Can you explain the concept of embedding in Go structs and its use cases?</li>
+</ul></li>
+</ul>
+<h3 id="interface-usage">5. <strong>Interface Usage</strong></h3>
+<ul>
+<li><strong>Basics:</strong>
+<ul>
+<li>What is an interface in Go, and how is it different from interfaces in other languages like Java or C#?</li>
+<li>How do you implement and use interfaces in Go?</li>
+</ul></li>
+<li><strong>Empty Interface:</strong>
+<ul>
+<li>What is the empty interface (<code>interface&#123;&#125;</code>) in Go, and how is it typically used?</li>
+<li>How do you perform type assertions and type switches on an empty interface?</li>
+</ul></li>
+<li><strong>Interface Design:</strong>
+<ul>
+<li>How do you design and use small, composable interfaces in Go?</li>
+<li>Can you explain the concept of duck typing in Go with respect to interfaces?</li>
+<li>What are the advantages and potential pitfalls of using interfaces in Go?</li>
+</ul></li>
+</ul>
+<h3 id="memory-management">6. <strong>Memory Management</strong></h3>
+<ul>
+<li><strong>Garbage Collection:</strong>
+<ul>
+<li>How does garbage collection work in Go?</li>
+<li>What are some strategies to optimize memory usage in Go?</li>
+</ul></li>
+<li><strong>Escape Analysis:</strong>
+<ul>
+<li>What is escape analysis, and how does it affect memory allocation in Go?</li>
+</ul></li>
+</ul>
+<h3 id="error-handling">7. <strong>Error Handling</strong></h3>
+<ul>
+<li><strong>Idiomatic Error Handling:</strong>
+<ul>
+<li>How is error handling typically done in Go?</li>
+<li>What are the advantages and disadvantages of Go's error handling approach?</li>
+</ul></li>
+<li><strong>Custom Error Types:</strong>
+<ul>
+<li>How do you create and use custom error types in Go?</li>
+<li>How do you implement and handle error wrapping in Go 1.13+?</li>
+</ul>
+<p>### 8. <strong>Go Idioms and Best Practices</strong></p></li>
+<li><strong>Testing:</strong>
+<ul>
+<li>How do you write and structure tests in Go?</li>
+<li>What tools do you use for testing in Go (e.g., <code>testing</code>, <code>testify</code>)?</li>
+</ul></li>
+<li><strong>Code Organization:</strong>
+<ul>
+<li>How do you structure a Go project?</li>
+<li>What are the best practices for managing dependencies in Go (e.g., Go modules)?</li>
+</ul></li>
+</ul>
+<h3 id="advanced-go-concepts">9. <strong>Advanced Go Concepts</strong></h3>
+<ul>
+<li><strong>Reflection:</strong>
+<ul>
+<li>What is reflection in Go, and how can it be used? What are the downsides?</li>
+</ul></li>
+<li><strong>Panic and Recover:</strong>
+<ul>
+<li>How do you handle panics in Go, and when should you use <code>recover</code>?</li>
+</ul></li>
+</ul>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/goroutine_leak/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/10/29/goroutine_leak/" class="post-title-link" itemprop="url">Goroutine Leaks</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-10-29 20:57:00 / Modified: 20:58:25" itemprop="dateCreated datePublished" datetime="2024-10-29T20:57:00+08:00">2024-10-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="common-causes-of-goroutine-leaks"><strong>1. Common Causes of Goroutine Leaks</strong></h2>
+<p>Here are the most frequent reasons why goroutines <strong>fail to exit gracefully</strong>, causing leaks:</p>
+<h3 id="blocking-on-channel-operations"><strong>1.1 Blocking on Channel Operations</strong></h3>
+<ul>
+<li>If a goroutine <strong>waits indefinitely</strong> on a channel that no one is writing to, it will never terminate.</li>
+</ul>
+<h3 id="example">Example:</h3>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">leakExample</span><span class="params">()</span></span> &#123;</span><br><span class="line">    ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>) <span class="comment">// No writer on the channel.</span></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        &lt;-ch <span class="comment">// Blocks forever.</span></span><br><span class="line">    &#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>Fix</strong>: Ensure the channel is <strong>closed or written to</strong> in all paths, or use <strong>timeouts</strong> with <code>select</code>.</li>
+</ul>
+<hr />
+<h3 id="forgotten-goroutines-in-background-tasks"><strong>1.2 Forgotten Goroutines in Background Tasks</strong></h3>
+<ul>
+<li>Goroutines spawned without any way to stop them may continue running indefinitely.</li>
+</ul>
+<h3 id="example-1">Example:</h3>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">startLeakyTask</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">for</span> &#123;</span><br><span class="line">            <span class="comment">// Do some work.</span></span><br><span class="line">            time.Sleep(<span class="number">1</span> * time.Second) <span class="comment">// Keeps running forever.</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>Fix</strong>: Use <strong>context cancellation</strong> to control when the goroutine should exit.</li>
+</ul>
+<hr />
+<h3 id="deadlocks-blocked-on-mutexes-or-channels"><strong>1.3 Deadlocks (Blocked on Mutexes or Channels)</strong></h3>
+<ul>
+<li>If two or more goroutines <strong>block waiting on each other</strong> (e.g., through channels or mutexes), they may never exit.</li>
+</ul>
+<h3 id="example-2">Example:</h3>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> mu sync.Mutex</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">deadlock</span><span class="params">()</span></span> &#123;</span><br><span class="line">    mu.Lock()</span><br><span class="line">    <span class="keyword">defer</span> mu.Unlock()</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        mu.Lock() <span class="comment">// Will block forever.</span></span><br><span class="line">        <span class="keyword">defer</span> mu.Unlock()</span><br><span class="line">    &#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>Fix</strong>: Ensure that <strong>locks and channels</strong> are always released properly to avoid deadlocks.</li>
+</ul>
+<hr />
+<h3 id="missing-exit-conditions-in-select-statements"><strong>1.4 Missing Exit Conditions in <code>select</code> Statements</strong></h3>
+<ul>
+<li>Goroutines using <code>select</code> without a proper <strong>exit condition</strong> may block forever.</li>
+</ul>
+<h3 id="example-3">Example:</h3>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">leakInSelect</span><span class="params">()</span></span> &#123;</span><br><span class="line">    ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">select</span> &#123;</span><br><span class="line">        <span class="keyword">case</span> val := &lt;-ch:</span><br><span class="line">            fmt.Println(val)</span><br><span class="line">        <span class="comment">// No way to exit the select block.</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>Fix</strong>: Add <strong>timeouts or cancellation signals</strong> to ensure the goroutine exits when appropriate.</li>
+</ul>
+<hr />
+<h3 id="waiting-on-network-or-io-operations-indefinitely"><strong>1.5 Waiting on Network or I/O Operations Indefinitely</strong></h3>
+<ul>
+<li>If a goroutine is <strong>waiting for a network call or I/O operation</strong> that never completes, it can leak.</li>
+</ul>
+<h3 id="example-4">Example:</h3>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">leakyNetworkCall</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        _, err := http.Get(<span class="string">&quot;http://example.com&quot;</span>) <span class="comment">// Network may hang.</span></span><br><span class="line">        <span class="keyword">if</span> err != <span class="literal">nil</span> &#123;</span><br><span class="line">            fmt.Println(<span class="string">&quot;Request failed&quot;</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>Fix</strong>: Use <strong>timeouts</strong> for network or I/O operations.</li>
+</ul>
+<h2 id="how-to-prevent-goroutine-leaks"><strong>2. How to Prevent Goroutine Leaks</strong></h2>
+<h3 id="use-context-cancellation"><strong>2.1 Use Context Cancellation</strong></h3>
+<p>Use <strong><code>context.Context</code></strong> to control when a goroutine should exit.</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">startTaskWithContext</span><span class="params">(ctx context.Context)</span></span> &#123;</span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">for</span> &#123;</span><br><span class="line">            <span class="keyword">select</span> &#123;</span><br><span class="line">            <span class="keyword">case</span> &lt;-ctx.Done():</span><br><span class="line">                fmt.Println(<span class="string">&quot;Goroutine exiting&quot;</span>)</span><br><span class="line">                <span class="keyword">return</span></span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                <span class="comment">// Do some work.</span></span><br><span class="line">                time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<hr />
+<h3 id="ensure-channels-are-closed-properly"><strong>2.2 Ensure Channels Are Closed Properly</strong></h3>
+<p>Always <strong>close channels</strong> to avoid blocking goroutines.</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">for</span> val := <span class="keyword">range</span> ch &#123;</span><br><span class="line">        fmt.Println(val)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;()</span><br><span class="line"></span><br><span class="line"><span class="built_in">close</span>(ch) <span class="comment">// Ensure the channel is closed to prevent blocking.</span></span><br></pre></td></tr></table></figure>
+<hr />
+<h3 id="use-sync.waitgroup-to-manage-goroutines"><strong>2.3 Use <code>sync.WaitGroup</code> to Manage Goroutines</strong></h3>
+<p>Use a <strong><code>sync.WaitGroup</code></strong> to ensure all goroutines complete before the program exits.</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> wg sync.WaitGroup</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">task</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">defer</span> wg.Done()</span><br><span class="line">    <span class="comment">// Do some work.</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    wg.Add(<span class="number">1</span>)</span><br><span class="line">    <span class="keyword">go</span> task()</span><br><span class="line">    wg.Wait() <span class="comment">// Wait for all goroutines to finish.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="reference">Reference</h2>
+<p><a target="_blank" rel="noopener" href="https://github.com/shaorui0/recipes/channel">Code snippets</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/pool_in_golang/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/10/29/pool_in_golang/" class="post-title-link" itemprop="url">Pooling in Golang</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-10-29 20:57:00 / Modified: 20:58:06" itemprop="dateCreated datePublished" datetime="2024-10-29T20:57:00+08:00">2024-10-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="understanding-the-purpose-of-each-pool"><strong>1. Understanding the Purpose of Each Pool</strong></h2>
+<h3 id="connection-pool"><strong>Connection Pool</strong></h3>
+<ul>
+<li><strong>What it does</strong>: Manages the number of <strong>active connections</strong>.</li>
+<li><strong>Purpose</strong>:
+<ul>
+<li>Ensures the server doesn’t get overwhelmed by too many concurrent client connections.</li>
+<li>Helps <strong>limit resource consumption</strong> (e.g., file descriptors, memory).</li>
+</ul></li>
+<li><strong>When to use</strong>:
+<ul>
+<li>When you expect <strong>high client concurrency</strong> (many clients connecting simultaneously).</li>
+</ul></li>
+</ul>
+<h3 id="goroutine-pool-worker-pool"><strong>Goroutine Pool (Worker Pool)</strong></h3>
+<ul>
+<li><strong>What it does</strong>: Limits the <strong>number of concurrent tasks</strong> (i.e., goroutines) for processing data.</li>
+<li><strong>Purpose</strong>:
+<ul>
+<li>Avoids <strong>goroutine explosion</strong>, where too many goroutines are created and overuse CPU/memory.</li>
+<li>Helps keep the system <strong>stable under heavy load</strong> by reusing workers.</li>
+</ul></li>
+<li><strong>When to use</strong>:
+<ul>
+<li>When each connection streams <strong>many messages</strong>, and <strong>each message needs to be processed</strong> by a worker thread (goroutine).</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="which-pool-do-you-need"><strong>2. Which Pool Do You Need?</strong></h2>
+<h3 id="scenario-analysis-client-streaming-grpc"><strong>Scenario Analysis: Client Streaming gRPC</strong></h3>
+<ol type="1">
+<li><strong>High number of concurrent client connections</strong>:
+<ul>
+<li>If <strong>many clients</strong> will open <strong>simultaneous streaming connections</strong>, you need a <strong>connection pool</strong> to <strong>limit active connections</strong>.</li>
+<li>Without a connection pool, the server could get overwhelmed by too many open connections, causing resource exhaustion.</li>
+</ul></li>
+<li><strong>High-frequency message streams from each client</strong>:
+<ul>
+<li>If each <strong>client connection streams many messages</strong> (e.g., metrics every second), <strong>goroutine reuse</strong> (worker pool) is important to <strong>avoid spawning a new goroutine for every message</strong>.</li>
+<li>This prevents <strong>excessive context switching</strong> and <strong>memory pressure</strong> from thousands of active goroutines.</li>
+</ul></li>
+</ol>
+<hr />
+<h3 id="decision-when-to-use-one-or-both"><strong>Decision: When to Use One or Both</strong></h3>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Case</strong></th>
+<th><strong>Use Connection Pool?</strong></th>
+<th><strong>Use Goroutine Pool?</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>High <strong>number of concurrent clients</strong></td>
+<td>✅ Yes</td>
+<td>Optional (if message processing is lightweight)</td>
+</tr>
+<tr class="even">
+<td>High <strong>frequency of streamed messages</strong> per client</td>
+<td>❌ No (if clients are few)</td>
+<td>✅ Yes, to avoid goroutine explosion</td>
+</tr>
+<tr class="odd">
+<td>Both <strong>many clients</strong> and <strong>frequent messages</strong></td>
+<td>✅ Yes</td>
+<td>✅ Yes</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="recommended-approach-for-your-case"><strong>3. Recommended Approach for Your Case</strong></h3>
+<p>Since your scenario involves <strong>client streaming of metrics</strong>, where clients send frequent messages (e.g., <strong>one message per second</strong>) and potentially many clients may connect:</p>
+<ul>
+<li><strong>You need both</strong> a <strong>connection pool</strong> and <strong>goroutine pool</strong>:
+<ul>
+<li><strong>Connection Pool</strong>: Limits the number of simultaneous client connections.</li>
+<li><strong>Goroutine Pool (Worker Pool)</strong>: Ensures efficient reuse of goroutines for <strong>processing each message</strong> from the stream.</li>
+</ul></li>
+</ul>
+<hr />
+<h2 id="implementation-strategy"><strong>4. Implementation Strategy</strong></h2>
+<p>You can <strong>combine both the connection pool and goroutine pool</strong> as shown below:</p>
+<ul>
+<li><strong>Connection Pool</strong>: Limits concurrent client connections.</li>
+<li><strong>Worker Pool</strong>: Handles the processing of individual metrics efficiently.</li>
+</ul>
+<h2 id="recommended-pool-sizes-based-on-typical-5g-scenarios"><strong>2. Recommended Pool Sizes Based on Typical 5G Scenarios</strong></h2>
+<p>Given the scale of <strong>5G metrics collection</strong>, here are <strong>ballpark numbers</strong> for <strong>pool sizes</strong>:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Metric</strong></th>
+<th><strong>Typical Number</strong></th>
+<th><strong>Explanation</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Concurrent Connections (Connection Pool)</strong></td>
+<td><strong>100–1,000</strong></td>
+<td>Each gNodeB, IoT device, or base station may open a stream to send metrics.</td>
+</tr>
+<tr class="even">
+<td><strong>Goroutine Pool Size (Worker Pool)</strong></td>
+<td><strong>2× to 5× the CPU core count</strong> (e.g., 32–64)</td>
+<td>Depends on the processing load. More workers help if the workload is CPU-bound.</td>
+</tr>
+<tr class="odd">
+<td><strong>Message Queue Buffer Size</strong></td>
+<td><strong>10,000+</strong> messages</td>
+<td>Buffer to handle bursts and avoid blocking if workers are busy.</td>
+</tr>
+<tr class="even">
+<td><strong>Message Frequency</strong></td>
+<td><strong>1–10 messages per second per client</strong></td>
+<td>Example: Metrics reporting at high frequency from each base station.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="recommended-pool-sizes-based-on-typical-5g-scenarios-1"><strong>5. Recommended Pool Sizes Based on Typical 5G Scenarios</strong></h2>
+<p>Given the scale of <strong>5G metrics collection</strong>, here are <strong>ballpark numbers</strong> for <strong>pool sizes</strong>:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Metric</strong></th>
+<th><strong>Typical Number</strong></th>
+<th><strong>Explanation</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Concurrent Connections (Connection Pool)</strong></td>
+<td><strong>100–1,000</strong></td>
+<td>Each gNodeB, IoT device, or base station may open a stream to send metrics.</td>
+</tr>
+<tr class="even">
+<td><strong>Goroutine Pool Size (Worker Pool)</strong></td>
+<td><strong>2× to 5× the CPU core count</strong> (e.g., 32–64)</td>
+<td>Depends on the processing load. More workers help if the workload is CPU-bound.</td>
+</tr>
+<tr class="odd">
+<td><strong>Message Queue Buffer Size</strong></td>
+<td><strong>10,000+</strong> messages</td>
+<td>Buffer to handle bursts and avoid blocking if workers are busy.</td>
+</tr>
+<tr class="even">
+<td><strong>Message Frequency</strong></td>
+<td><strong>1–10 messages per second per client</strong></td>
+<td>Example: Metrics reporting at high frequency from each base station.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="reference">Reference</h2>
+<p><a target="_blank" rel="noopener" href="https://github.com/shaorui0/recipes/blob/main/pool/conn_client_pool.go">[Code snippet] Connection pool in client side</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/shaorui0/recipes/blob/main/pool/conn_serv_pool.go">[Code snippet] Connection pool in server side</a></p>
+<p><a target="_blank" rel="noopener" href="https://github.com/shaorui0/recipes/blob/main/pool/obj_pool.go">[Code snippet] Object pool</a></p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/28/task_management/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -367,14 +911,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">5</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-count">6</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
