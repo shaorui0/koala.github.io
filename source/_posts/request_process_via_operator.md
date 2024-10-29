@@ -6,9 +6,8 @@ tags: [kubernetes, operator]
 
 how does the outside (cluster) network request access the k8s operator and final the operator handle the process? answer the process in low level, suck as tcp/ip, k8s service mechanism, CRD, operator reconcile, manager and controller in operator, etc
 
-![operator_process.png](/images/operator_process.png)
+![](/images/operator_process.png)
 
-source/images
 ```mermaid
 flowchart TD
   A[External Request] --> B[DNS Resolution]
