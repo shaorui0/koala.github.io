@@ -155,6 +155,255 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/monitoring_loki/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/10/29/monitoring_loki/" class="post-title-link" itemprop="url">Monitoring the Loki Logging System</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-10-29 21:57:00 / Modified: 21:38:09" itemprop="dateCreated datePublished" datetime="2024-10-29T21:57:00+08:00">2024-10-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="monitoring-the-loki-logging-system">Monitoring the Loki Logging System</h1>
+<p>In a high-concurrency environment where Loki handles intensive log processing and storage, monitoring metrics are essential for ensuring system stability, performance optimization, and dynamically adjusting configurations (such as replicas and sharding). Here are the main Loki component metrics you can monitor to dynamically adjust system settings as needed:</p>
+<h3 id="loki-ingester-metrics">1. <strong>Loki Ingester Metrics</strong></h3>
+<ul>
+<li><p><strong><code>loki_ingester_memory_usage_bytes</code></strong>:</p>
+<p>Monitors memory usage for each Ingester instance. If memory usage remains close to system limits, consider increasing the number of Ingester replicas to distribute the load.</p>
+<ul>
+<li><strong>Purpose</strong>: Dynamically scale up or down the number of Ingester replicas based on memory usage.</li>
+</ul></li>
+<li><p><strong><code>loki_ingester_wal_fsync_duration_seconds</code></strong>:</p>
+<p>Monitors the time each Ingester instance takes to write WAL (Write-Ahead Log) data to disk. High write durations may indicate that write throughput is nearing its limit; consider expanding sharding or increasing storage bandwidth.</p>
+<ul>
+<li><strong>Purpose</strong>: Use WAL write latency to determine if scaling or storage optimization is needed.</li>
+</ul></li>
+<li><p><strong><code>loki_ingester_chunk_store_writes_total</code></strong> and <strong><code>loki_ingester_chunk_store_reads_total</code></strong>:</p>
+<p>Monitors the total number of chunk reads and writes. If write volume spikes, consider expanding the storage layer by adding more storage nodes to improve write performance.</p>
+<ul>
+<li><strong>Purpose</strong>: Assess whether to increase storage capacity or optimize storage performance.</li>
+</ul></li>
+</ul>
+<h3 id="loki-distributor-metrics">2. <strong>Loki Distributor Metrics</strong></h3>
+<ul>
+<li><p><strong><code>loki_distributor_received_bytes_total</code></strong>:</p>
+<p>Monitors the total volume of log data received by the Distributor. If data volume significantly increases, consider adjusting the sharding strategy or adding more Distributor instances.</p>
+<ul>
+<li><strong>Purpose</strong>: Adjust sharding strategy based on log traffic and dynamically manage sharding to distribute log data.</li>
+</ul></li>
+<li><p><strong><code>loki_distributor_ring_members</code></strong>:</p>
+<p>Monitors the number of Ingesters actively handling log traffic in Loki's sharding model. If the number of active members is lower than expected (e.g., some Ingester nodes have crashed), consider increasing the number of Ingester replicas.</p>
+<ul>
+<li><strong>Purpose</strong>: Scale up or down the number of Ingester replicas based on the number of active Ingesters.</li>
+</ul></li>
+<li><p><strong><code>loki_distributor_accepted_requests_total</code></strong> and <strong><code>loki_distributor_rejected_requests_total</code></strong>:</p>
+<p>Monitors the number of accepted and rejected requests. Rejected requests may indicate that the system is overloaded, and additional capacity may be necessary.</p>
+<ul>
+<li><strong>Purpose</strong>: Adjust replicas and load distribution based on the count of rejected requests and system load.</li>
+</ul></li>
+</ul>
+<h3 id="loki-querier-metrics">3. <strong>Loki Querier Metrics</strong></h3>
+<ul>
+<li><p><strong><code>loki_querier_request_duration_seconds</code></strong>:</p>
+<p>Monitors query response times. If query response times increase, it may indicate high query load, in which case you may need to scale up the number of Querier instances.</p>
+<ul>
+<li><strong>Purpose</strong>: Dynamically add Querier instances to handle more query requests and reduce response times.</li>
+</ul></li>
+<li><p><strong><code>loki_querier_requests_total</code></strong>:</p>
+<p>Monitors the total number of query requests. If the query volume becomes too high, it could slow down the system, so consider increasing the number of Querier replicas.</p>
+<ul>
+<li><strong>Purpose</strong>: Scale Querier instances up or down based on query volume to improve response speed.</li>
+</ul></li>
+</ul>
+<h3 id="storage-metrics">4. <strong>Storage Metrics</strong></h3>
+<ul>
+<li><p><strong><code>loki_chunk_store_writes_total</code></strong> and <strong><code>loki_chunk_store_read_duration_seconds</code></strong>: Monitors chunk data read/write time and frequency in storage. High write frequency or increased read time may indicate a storage performance bottleneck, necessitating either additional storage capacity or optimized storage strategies.</p>
+<ul>
+<li><strong>Purpose</strong>: Adjust storage configuration and add storage nodes to minimize storage bottlenecks affecting query or write performance.</li>
+</ul></li>
+</ul>
+<h3 id="system-level-resource-monitoring">5. <strong>System-Level Resource Monitoring</strong></h3>
+<ul>
+<li><p><strong>CPU and Memory Usage</strong>: Using <strong>Prometheus</strong> or Kubernetes' native monitoring tools (like HPA or VPA), monitor CPU and memory usage for Loki components (e.g., Ingester, Distributor, Querier). If resource usage for any component approaches its limits, consider horizontally scaling the number of replicas for that component.</p>
+<ul>
+<li><strong>Purpose</strong>: Dynamically adjust replicas based on CPU and memory usage.</li>
+</ul></li>
+</ul>
+<h3 id="high-availability-monitoring">6. <strong>High Availability Monitoring</strong></h3>
+<ul>
+<li><p><strong><code>loki_ring_members</code></strong>: Monitors the number of nodes in Loki's sharding ring, ensuring all nodes in the cluster are active. If node count decreases, consider rebalancing the shards or adding more instances to compensate for lost nodes.</p>
+<ul>
+<li><strong>Purpose</strong>: Dynamically adjust high-availability configurations based on ring member count.</li>
+</ul></li>
+</ul>
+<h3 id="dynamic-adjustment-mechanisms">Dynamic Adjustment Mechanisms:</h3>
+<h3 id="replica-based-dynamic-scaling">1. <strong>Replica-Based Dynamic Scaling</strong>:</h3>
+<ul>
+<li><p>When metrics like <code>loki_ingester_memory_usage_bytes</code> or <code>loki_distributor_received_bytes_total</code> indicate high load, you can dynamically increase <code>replicas</code> by using <code>kubectl scale</code> or HPA (Horizontal Pod Autoscaler) to adjust instance numbers based on real-time load.</p></li>
+<li><p>Example: Use HPA to automatically scale Promtail, Ingester, or Querier instances:</p>
+<p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl autoscale statefulset loki-ingester --min=3 --max=10 --cpu-percent=80</span><br></pre></td></tr></table></figure></p></li>
+</ul>
+<h3 id="sharding-based-dynamic-scaling">2. <strong>Sharding-Based Dynamic Scaling</strong>:</h3>
+<ul>
+<li><p>When metrics like <code>loki_distributor_received_bytes_total</code> or <code>loki_ingester_chunk_store_writes_total</code> show a surge in log traffic, adjust the <code>shard_by_all_labels</code> configuration or use the <code>sharding</code> parameter in Loki’s configuration to dynamically increase the number of log shards.</p></li>
+<li><p>Example: Increase <code>shard</code> count for Distributors and Ingesters to distribute more log data across multiple Ingester nodes.</p></li>
+</ul>
+<p>These metrics can be easily collected with Prometheus and displayed in Grafana. Combined with Loki's configuration adjustments, they enable real-time dynamic configuration optimization to ensure system performance and stability in high-concurrency environments.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/loki_intro/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/10/29/loki_intro/" class="post-title-link" itemprop="url">Loki Introduction</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-10-29 21:40:00 / Modified: 21:39:46" itemprop="dateCreated datePublished" datetime="2024-10-29T21:40:00+08:00">2024-10-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <pre class="mermaid">graph TD
+    subgraph Loki Stack
+        A[Client] -->|Push Logs| B[Distributor]
+        B -->|Distribute Logs| C[Ingester]
+        C -->|Store Logs| D[Chunk Store]
+        E[Querier] -->|Fetch Logs| D
+        F[Query Frontend] -->|Distribute Queries| E
+        G[Client] -->|Query Logs| F
+    end
+
+    subgraph External Systems
+        H[Promtail] -->|Send Logs| A
+        I[Grafana] -->|Visualize Logs| G
+    end</pre>
+<h2 id="components-description"><strong>Components Description</strong></h2>
+<ul>
+<li><strong>Client</strong>: The source of log data, which can be applications, services, or other logging agents.</li>
+<li><strong>Distributor</strong>: Receives log data from clients and distributes it to the ingesters.</li>
+<li><strong>Ingester</strong>: Processes and stores log data temporarily before it is flushed to the chunk store.</li>
+<li><strong>Chunk Store</strong>: A long-term storage solution for log data, such as an object store (e.g., S3, GCS).</li>
+<li><strong>Querier</strong>: Fetches log data from the chunk store to respond to user queries.</li>
+<li><strong>Query Frontend</strong>: Distributes incoming queries to multiple queriers for load balancing and parallel processing.</li>
+<li><strong>Promtail</strong>: A log collection agent that sends logs to the Loki distributor.</li>
+<li><strong>Grafana</strong>: A visualization tool that queries Loki for log data and displays it in dashboards.</li>
+</ul>
+<h2 id="interaction-flow"><strong>Interaction Flow</strong></h2>
+<ol type="1">
+<li><strong>Log Ingestion</strong>:
+<ul>
+<li>Logs are sent from the <strong>Client</strong> to the <strong>Distributor</strong>.</li>
+<li>The <strong>Distributor</strong> distributes the logs to multiple <strong>Ingesters</strong>.</li>
+<li><strong>Ingesters</strong> process and temporarily store the logs before flushing them to the <strong>Chunk Store</strong>.</li>
+</ul></li>
+<li><strong>Log Storage</strong>:
+<ul>
+<li><strong>Ingesters</strong> periodically flush processed logs to the <strong>Chunk Store</strong> for long-term storage.</li>
+</ul></li>
+<li><strong>Log Querying</strong>:
+<ul>
+<li><strong>Clients</strong> (e.g., Grafana) send queries to the <strong>Query Frontend</strong>.</li>
+<li>The <strong>Query Frontend</strong> distributes the queries to multiple <strong>Queriers</strong>.</li>
+<li><strong>Queriers</strong> fetch the required log data from the <strong>Chunk Store</strong> and return it to the <strong>Client</strong>.</li>
+</ul></li>
+<li><strong>Visualization</strong>:
+<ul>
+<li><strong>Grafana</strong> queries Loki for log data and visualizes it in dashboards.</li>
+</ul></li>
+</ol>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/golang_syntax_questions/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -547,6 +796,153 @@
   
   
 
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/27/invest_principle/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/10/27/invest_principle/" class="post-title-link" itemprop="url">How to Handle Market Volatility, Rebalance, and Information Gathering Strategies</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2024-10-27 20:47:00" itemprop="dateCreated datePublished" datetime="2024-10-27T20:47:00+08:00">2024-10-27</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-10-29 21:29:00" itemprop="dateModified" datetime="2024-10-29T21:29:00+08:00">2024-10-29</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="how-to-handle-market-volatility-rebalance-and-information-gathering-strategies">How to Handle Market Volatility, Rebalance, and Information Gathering Strategies</h2>
+<p>In the face of market volatility and changes in the macro environment, it is essential to stay rational and disciplined. Dynamic rebalancing and information gathering can help optimize investment portfolios. Below are detailed strategies for handling volatility, rebalancing, and information gathering.</p>
+<h3 id="how-to-handle-market-volatility">1. How to Handle Market Volatility</h3>
+<h4 id="maintain-a-long-term-perspective">Maintain a Long-Term Perspective</h4>
+<ul>
+<li>Short-term fluctuations are part of the market; avoid emotional actions based on temporary changes.</li>
+<li>Berkshire Hathaway's investment philosophy—"Be fearful when others are greedy, and greedy when others are fearful"—is a classic rule for managing market volatility.</li>
+</ul>
+<h4 id="dollar-cost-averaging">Dollar-Cost Averaging</h4>
+<ul>
+<li>Invest funds in installments to reduce the risk of a single large investment. Regular investments can help smooth out market fluctuations and lower purchasing costs.</li>
+</ul>
+<h4 id="establish-stop-loss-and-take-profit-mechanisms">Establish Stop-Loss and Take-Profit Mechanisms</h4>
+<ul>
+<li>Set reasonable stop-loss points to limit potential losses.</li>
+<li>Also set take-profit points to ensure gains are realized during market highs.</li>
+</ul>
+<h4 id="risk-balancing">Risk Balancing</h4>
+<ul>
+<li>When market volatility increases, consider adding more bonds or gold as safe-haven assets, reducing the proportion of high-risk assets.</li>
+</ul>
+<h3 id="how-to-rebalance-the-portfolio">2. How to Rebalance the Portfolio</h3>
+<h4 id="set-rebalancing-rules">Set Rebalancing Rules</h4>
+<ul>
+<li><strong>Time-Based Rebalancing:</strong> Rebalance every 6-12 months to restore assets to their original proportions.</li>
+<li><strong>Threshold-Based Rebalancing:</strong> Rebalance when an asset deviates from its original allocation by a certain percentage (e.g., 5%).</li>
+</ul>
+<h4 id="rebalancing-example">Rebalancing Example</h4>
+<ul>
+<li>If Berkshire or the S&amp;P 500 grows too quickly, causing an overweight, sell some gains and increase bonds or emerging market ETFs.</li>
+<li>If the bond proportion rises (reflecting a risk-off sentiment), sell some bonds and increase stock assets to capture potential rebound opportunities.</li>
+</ul>
+<h4 id="staged-rebalancing">Staged Rebalancing</h4>
+<ul>
+<li>Avoid one-time adjustments; instead, rebalance in multiple steps to reduce the impact of major market fluctuations on the overall portfolio.</li>
+</ul>
+<h3 id="how-to-gather-information-for-adjustments">3. How to Gather Information for Adjustments</h3>
+<h4 id="track-macroeconomic-data">Track Macroeconomic Data</h4>
+<ul>
+<li>Monitor key indicators like GDP growth, unemployment rate, inflation level, and interest rate decisions.</li>
+<li><strong>Data Sources:</strong> Federal Reserve, European Central Bank, World Bank, IMF.</li>
+<li>Increase bond allocation when interest rates rise, and stock allocation during economic recovery.</li>
+</ul>
+<h4 id="market-trends-and-industry-analysis">Market Trends and Industry Analysis</h4>
+<ul>
+<li>Regularly review market analysis reports from financial institutions (e.g., Goldman Sachs, JPMorgan) and financial media (e.g., Bloomberg, CNBC).</li>
+<li>Pay attention to policy changes and economic trends in emerging markets (e.g., India) and adjust international ETFs accordingly.</li>
+</ul>
+<h4 id="company-financials-and-business-updates">Company Financials and Business Updates</h4>
+<ul>
+<li>Focus on quarterly reports of Berkshire's investment targets and major S&amp;P 500 companies to determine if individual stocks or ETF holdings need adjustment.</li>
+</ul>
+<h4 id="geopolitical-risks-and-commodity-dynamics">Geopolitical Risks and Commodity Dynamics</h4>
+<ul>
+<li>Monitor geopolitical events, energy prices, and commodity markets; increase gold or other safe-haven assets as needed.</li>
+</ul>
+<h4 id="investment-community-and-expert-insights">Investment Community and Expert Insights</h4>
+<ul>
+<li>Participate in investor communities like Reddit and Seeking Alpha to gauge market sentiment.</li>
+<li>Follow investment gurus like Warren Buffett to learn from their portfolio moves.</li>
+</ul>
+<h4 id="tools-and-platforms">Tools and Platforms</h4>
+<ul>
+<li><strong>Bloomberg, CNBC, Reuters:</strong> Obtain the latest market updates and analysis reports.</li>
+<li><strong>Yahoo Finance, Google Finance:</strong> Monitor the performance of various assets.</li>
+<li><strong>Federal Reserve Website:</strong> Track monetary policy and economic indicators.</li>
+<li><strong>ETF Websites or Fund Manager Reports:</strong> Check ETF investment targets, holdings changes, and market forecasts.</li>
+</ul>
+<h3 id="rebalancing-example-scenario">4. Rebalancing Example Scenario</h3>
+<p><strong>Scenario:</strong> The U.S. economy enters a recession, and market volatility increases. - <strong>Bond ETF (TLT)</strong> prices rise (safe-haven inflows), and the S&amp;P 500 declines.</p>
+<h4 id="rebalancing-strategy">Rebalancing Strategy:</h4>
+<ul>
+<li>Sell some bond ETFs to lock in gains, preparing to buy stocks at lower levels.</li>
+<li>Gradually buy the S&amp;P 500, building positions in installments to capture rebound opportunities.</li>
+<li>Increase gold holdings to hedge against economic uncertainty and dollar depreciation risk.</li>
+</ul>
+<h3 id="conclusion-strategies-for-managing-volatility-with-stability">Conclusion: Strategies for Managing Volatility with Stability</h3>
+<ul>
+<li>Disciplined rebalancing ensures that the portfolio isn’t overly exposed to the fluctuations of a single asset.</li>
+<li>Diversified investment and dynamic rebalancing balance risk and return.</li>
+<li>Timely macro and market information gathering enables flexible adjustments based on real conditions.</li>
+</ul>
+<p>By staying calm and rational, and relying on data-driven decisions, you can manage your portfolio more effectively, navigate market volatility smoothly, and achieve long-term wealth growth goals.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
 
   
 
@@ -613,14 +1009,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">8</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

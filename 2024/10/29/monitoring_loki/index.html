@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="Monitoring the Loki Logging System In a high-concurrency environment where Loki handles intensive log processing and storage, monitoring metrics are essential for ensuring system stability, performanc">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Monitoring the Loki Logging System">
+<meta property="og:url" content="http://example.com/2024/10/29/monitoring_loki/index.html">
+<meta property="og:site_name" content="Justin Shao&#39;s Space">
+<meta property="og:description" content="Monitoring the Loki Logging System In a high-concurrency environment where Loki handles intensive log processing and storage, monitoring metrics are essential for ensuring system stability, performanc">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-10-29T13:57:00.000Z">
+<meta property="article:modified_time" content="2024-10-29T13:38:09.614Z">
+<meta property="article:author" content="Justin Shao">
+<meta property="article:tag" content="loki">
+<meta property="article:tag" content="log">
+<meta property="article:tag" content="monitor">
+<meta property="article:tag" content="telemetry">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2024/10/29/monitoring_loki/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Monitoring the Loki Logging System | Justin Shao's Space</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Justin Shao's Space</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/monitoring_loki/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Monitoring the Loki Logging System
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-10-29 21:57:00 / Modified: 21:38:09" itemprop="dateCreated datePublished" datetime="2024-10-29T21:57:00+08:00">2024-10-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="monitoring-the-loki-logging-system">Monitoring the Loki Logging System</h1>
+<p>In a high-concurrency environment where Loki handles intensive log processing and storage, monitoring metrics are essential for ensuring system stability, performance optimization, and dynamically adjusting configurations (such as replicas and sharding). Here are the main Loki component metrics you can monitor to dynamically adjust system settings as needed:</p>
+<h3 id="loki-ingester-metrics">1. <strong>Loki Ingester Metrics</strong></h3>
+<ul>
+<li><p><strong><code>loki_ingester_memory_usage_bytes</code></strong>:</p>
+<p>Monitors memory usage for each Ingester instance. If memory usage remains close to system limits, consider increasing the number of Ingester replicas to distribute the load.</p>
+<ul>
+<li><strong>Purpose</strong>: Dynamically scale up or down the number of Ingester replicas based on memory usage.</li>
+</ul></li>
+<li><p><strong><code>loki_ingester_wal_fsync_duration_seconds</code></strong>:</p>
+<p>Monitors the time each Ingester instance takes to write WAL (Write-Ahead Log) data to disk. High write durations may indicate that write throughput is nearing its limit; consider expanding sharding or increasing storage bandwidth.</p>
+<ul>
+<li><strong>Purpose</strong>: Use WAL write latency to determine if scaling or storage optimization is needed.</li>
+</ul></li>
+<li><p><strong><code>loki_ingester_chunk_store_writes_total</code></strong> and <strong><code>loki_ingester_chunk_store_reads_total</code></strong>:</p>
+<p>Monitors the total number of chunk reads and writes. If write volume spikes, consider expanding the storage layer by adding more storage nodes to improve write performance.</p>
+<ul>
+<li><strong>Purpose</strong>: Assess whether to increase storage capacity or optimize storage performance.</li>
+</ul></li>
+</ul>
+<h3 id="loki-distributor-metrics">2. <strong>Loki Distributor Metrics</strong></h3>
+<ul>
+<li><p><strong><code>loki_distributor_received_bytes_total</code></strong>:</p>
+<p>Monitors the total volume of log data received by the Distributor. If data volume significantly increases, consider adjusting the sharding strategy or adding more Distributor instances.</p>
+<ul>
+<li><strong>Purpose</strong>: Adjust sharding strategy based on log traffic and dynamically manage sharding to distribute log data.</li>
+</ul></li>
+<li><p><strong><code>loki_distributor_ring_members</code></strong>:</p>
+<p>Monitors the number of Ingesters actively handling log traffic in Loki's sharding model. If the number of active members is lower than expected (e.g., some Ingester nodes have crashed), consider increasing the number of Ingester replicas.</p>
+<ul>
+<li><strong>Purpose</strong>: Scale up or down the number of Ingester replicas based on the number of active Ingesters.</li>
+</ul></li>
+<li><p><strong><code>loki_distributor_accepted_requests_total</code></strong> and <strong><code>loki_distributor_rejected_requests_total</code></strong>:</p>
+<p>Monitors the number of accepted and rejected requests. Rejected requests may indicate that the system is overloaded, and additional capacity may be necessary.</p>
+<ul>
+<li><strong>Purpose</strong>: Adjust replicas and load distribution based on the count of rejected requests and system load.</li>
+</ul></li>
+</ul>
+<h3 id="loki-querier-metrics">3. <strong>Loki Querier Metrics</strong></h3>
+<ul>
+<li><p><strong><code>loki_querier_request_duration_seconds</code></strong>:</p>
+<p>Monitors query response times. If query response times increase, it may indicate high query load, in which case you may need to scale up the number of Querier instances.</p>
+<ul>
+<li><strong>Purpose</strong>: Dynamically add Querier instances to handle more query requests and reduce response times.</li>
+</ul></li>
+<li><p><strong><code>loki_querier_requests_total</code></strong>:</p>
+<p>Monitors the total number of query requests. If the query volume becomes too high, it could slow down the system, so consider increasing the number of Querier replicas.</p>
+<ul>
+<li><strong>Purpose</strong>: Scale Querier instances up or down based on query volume to improve response speed.</li>
+</ul></li>
+</ul>
+<h3 id="storage-metrics">4. <strong>Storage Metrics</strong></h3>
+<ul>
+<li><p><strong><code>loki_chunk_store_writes_total</code></strong> and <strong><code>loki_chunk_store_read_duration_seconds</code></strong>: Monitors chunk data read/write time and frequency in storage. High write frequency or increased read time may indicate a storage performance bottleneck, necessitating either additional storage capacity or optimized storage strategies.</p>
+<ul>
+<li><strong>Purpose</strong>: Adjust storage configuration and add storage nodes to minimize storage bottlenecks affecting query or write performance.</li>
+</ul></li>
+</ul>
+<h3 id="system-level-resource-monitoring">5. <strong>System-Level Resource Monitoring</strong></h3>
+<ul>
+<li><p><strong>CPU and Memory Usage</strong>: Using <strong>Prometheus</strong> or Kubernetes' native monitoring tools (like HPA or VPA), monitor CPU and memory usage for Loki components (e.g., Ingester, Distributor, Querier). If resource usage for any component approaches its limits, consider horizontally scaling the number of replicas for that component.</p>
+<ul>
+<li><strong>Purpose</strong>: Dynamically adjust replicas based on CPU and memory usage.</li>
+</ul></li>
+</ul>
+<h3 id="high-availability-monitoring">6. <strong>High Availability Monitoring</strong></h3>
+<ul>
+<li><p><strong><code>loki_ring_members</code></strong>: Monitors the number of nodes in Loki's sharding ring, ensuring all nodes in the cluster are active. If node count decreases, consider rebalancing the shards or adding more instances to compensate for lost nodes.</p>
+<ul>
+<li><strong>Purpose</strong>: Dynamically adjust high-availability configurations based on ring member count.</li>
+</ul></li>
+</ul>
+<h3 id="dynamic-adjustment-mechanisms">Dynamic Adjustment Mechanisms:</h3>
+<h3 id="replica-based-dynamic-scaling">1. <strong>Replica-Based Dynamic Scaling</strong>:</h3>
+<ul>
+<li><p>When metrics like <code>loki_ingester_memory_usage_bytes</code> or <code>loki_distributor_received_bytes_total</code> indicate high load, you can dynamically increase <code>replicas</code> by using <code>kubectl scale</code> or HPA (Horizontal Pod Autoscaler) to adjust instance numbers based on real-time load.</p></li>
+<li><p>Example: Use HPA to automatically scale Promtail, Ingester, or Querier instances:</p>
+<p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl autoscale statefulset loki-ingester --min=3 --max=10 --cpu-percent=80</span><br></pre></td></tr></table></figure></p></li>
+</ul>
+<h3 id="sharding-based-dynamic-scaling">2. <strong>Sharding-Based Dynamic Scaling</strong>:</h3>
+<ul>
+<li><p>When metrics like <code>loki_distributor_received_bytes_total</code> or <code>loki_ingester_chunk_store_writes_total</code> show a surge in log traffic, adjust the <code>shard_by_all_labels</code> configuration or use the <code>sharding</code> parameter in Loki’s configuration to dynamically increase the number of log shards.</p></li>
+<li><p>Example: Increase <code>shard</code> count for Distributors and Ingesters to distribute more log data across multiple Ingester nodes.</p></li>
+</ul>
+<p>These metrics can be easily collected with Prometheus and displayed in Grafana. Combined with Loki's configuration adjustments, they enable real-time dynamic configuration optimization to ensure system performance and stability in high-concurrency environments.</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/loki/" rel="tag"># loki</a>
+              <a href="/tags/log/" rel="tag"># log</a>
+              <a href="/tags/monitor/" rel="tag"># monitor</a>
+              <a href="/tags/telemetry/" rel="tag"># telemetry</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/10/29/loki_intro/" rel="prev" title="Loki Introduction">
+      <i class="fa fa-chevron-left"></i> Loki Introduction
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#monitoring-the-loki-logging-system"><span class="nav-number">1.</span> <span class="nav-text">Monitoring the Loki Logging System</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#loki-ingester-metrics"><span class="nav-number">1.0.1.</span> <span class="nav-text">1. Loki Ingester Metrics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#loki-distributor-metrics"><span class="nav-number">1.0.2.</span> <span class="nav-text">2. Loki Distributor Metrics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#loki-querier-metrics"><span class="nav-number">1.0.3.</span> <span class="nav-text">3. Loki Querier Metrics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#storage-metrics"><span class="nav-number">1.0.4.</span> <span class="nav-text">4. Storage Metrics</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#system-level-resource-monitoring"><span class="nav-number">1.0.5.</span> <span class="nav-text">5. System-Level Resource Monitoring</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#high-availability-monitoring"><span class="nav-number">1.0.6.</span> <span class="nav-text">6. High Availability Monitoring</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dynamic-adjustment-mechanisms"><span class="nav-number">1.0.7.</span> <span class="nav-text">Dynamic Adjustment Mechanisms:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#replica-based-dynamic-scaling"><span class="nav-number">1.0.8.</span> <span class="nav-text">1. Replica-Based Dynamic Scaling:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sharding-based-dynamic-scaling"><span class="nav-number">1.0.9.</span> <span class="nav-text">2. Sharding-Based Dynamic Scaling:</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Justin Shao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/shaorui0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;shaorui0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:sr1054461216@gmail.com" title="E-Mail → mailto:sr1054461216@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Justin Shao</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
