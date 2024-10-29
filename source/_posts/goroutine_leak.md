@@ -24,6 +24,7 @@ func leakExample() {
 ```
 
 - **Fix**: Ensure the channel is **closed or written to** in all paths, or use **timeouts** with `select`.
+<!-- more -->
 
 ---
 

@@ -18,6 +18,7 @@ In an interview for a Go (Golang) developer position, you can expect questions t
     - How would you implement a worker pool using goroutines and channels?
     - Explain the concept of channel direction and how it’s used in Go.
     - How do you handle channel closing, and what are the implications of closing a channel?
+<!-- more -->
 
 ### 2. **HTTP Operations**
 

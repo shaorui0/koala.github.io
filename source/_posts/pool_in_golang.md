@@ -23,6 +23,7 @@ tags: [golang, pooling]
     - Helps keep the system **stable under heavy load** by reusing workers.
 - **When to use**:
     - When each connection streams **many messages**, and **each message needs to be processed** by a worker thread (goroutine).
+<!-- more -->
 
 ---
 
