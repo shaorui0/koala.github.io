@@ -44,6 +44,43 @@ graph TD
 
 ## Optimization Actions for High-Concurrency Log Processing and Storage Scalability
 
+```mermaid
+graph TD
+    %% Clients and Log Collection
+    Client[Clients / Applications] -->|Send Logs| Promtail[Promtail]
+    
+    %% Ingestion Pipeline
+    Promtail -->|Push Logs| Distributor[Distributor Cluster]
+    Distributor -->|Distribute to| Ingesters[Ingester Cluster]
+    
+    %% Storage Layers
+    Ingesters -->|Write to| Storage["Object Storage<br/> (S3, GCS, etc.)"]
+    Ingesters -->|Maintain Temporary Data| Cache[In-Memory Cache]
+    
+    %% Query Pipeline
+    Querier[Querier Cluster] -->|Fetch from Storage| Storage
+    Querier -->|Retrieve from Cache| Cache
+    Querier -->|Access Index| Index[Index Gateway]
+    
+    %% Compaction and Maintenance
+    Compactor[Compactor] -->|Compact Data| Storage
+    
+    %% Alerting and Visualization
+    Ruler[Ruler] -->|Fetch Rules| Storage
+    Ruler -->|Evaluate Alerts| Querier
+    Grafana[Grafana] -->|Visualize Logs| Querier
+    Grafana -->|Manage Alerts| Ruler
+    
+    %% Additional Interactions
+    Ingesters -->|Send Metrics| Metrics[Metrics & Monitoring]
+    Querier -->|Send Metrics| Metrics
+    Distributor -->|Send Metrics| Metrics
+    Promtail -->|Send Metrics| Metrics
+    Ruler -->|Send Metrics| Metrics
+    Compactor -->|Send Metrics| Metrics
+    Grafana -->|Display Metrics| Metrics
+
+```
 ### 1. **Horizontal Scaling of Log Collection: Promtail**
 
 - **Action**: Increase the number of Promtail instances to handle the load of log collection in a high-concurrency environment. Promtail is Loki's log collection agent, responsible for gathering logs from various nodes.
