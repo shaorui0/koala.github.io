@@ -20,36 +20,28 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="how does the outside (cluster) network request access the k8s operator and final the operator handle the process? answer the process in low level, suck as tcp&#x2F;ip, k8s service mechanism, CRD, operator">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Outside network request access the k8s operator">
-<meta property="og:url" content="http://example.com/2024/10/29/request_process_via_operator/index.html">
+  <meta property="og:type" content="website">
+<meta property="og:title" content="Justin Shao&#39;s Space">
+<meta property="og:url" content="http://example.com/page/2/index.html">
 <meta property="og:site_name" content="Justin Shao&#39;s Space">
-<meta property="og:description" content="how does the outside (cluster) network request access the k8s operator and final the operator handle the process? answer the process in low level, suck as tcp&#x2F;ip, k8s service mechanism, CRD, operator">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="http://example.com/images/operator_process.png">
-<meta property="article:published_time" content="2024-10-29T14:57:00.000Z">
-<meta property="article:modified_time" content="2024-10-29T15:31:51.123Z">
 <meta property="article:author" content="Justin Shao">
-<meta property="article:tag" content="kubernetes">
-<meta property="article:tag" content="operator">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/images/operator_process.png">
 
-<link rel="canonical" href="http://example.com/2024/10/29/request_process_via_operator/">
+<link rel="canonical" href="http://example.com/page/2/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : false,
-    isPost : true,
+    isHome : true,
+    isPost : false,
     lang   : 'en'
   };
 </script>
 
-  <title>Outside network request access the k8s operator | Justin Shao's Space</title>
+  <title>Justin Shao's Space</title>
   
 
 
@@ -157,14 +149,13 @@
         <div class="content-wrap">
           
 
-          <div class="content post posts-expand">
+          <div class="content index posts-expand">
             
-
-    
+      
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/request_process_via_operator/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/27/invest_principle/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -176,9 +167,10 @@
       <meta itemprop="name" content="Justin Shao's Space">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Outside network request access the k8s operator
-        </h1>
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/10/27/invest_principle/" class="post-title-link" itemprop="url">How to Handle Market Volatility, Rebalance, and Information Gathering Strategies</a>
+        </h2>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -186,10 +178,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2024-10-29 22:57:00 / Modified: 23:31:51" itemprop="dateCreated datePublished" datetime="2024-10-29T22:57:00+08:00">2024-10-29</time>
+              <time title="Created: 2024-10-27 20:47:00" itemprop="dateCreated datePublished" datetime="2024-10-27T20:47:00+08:00">2024-10-27</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-10-29 21:29:00" itemprop="dateModified" datetime="2024-10-29T21:29:00+08:00">2024-10-29</time>
+              </span>
 
           
 
@@ -202,90 +200,109 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>how does the outside (cluster) network request access the k8s operator and final the operator handle the process? answer the process in low level, suck as tcp/ip, k8s service mechanism, CRD, operator reconcile, manager and controller in operator, etc</p>
-<p><img src="/images/operator_process.png" /></p>
-<pre class="mermaid">flowchart TD
-  A[External Request] --> B[DNS Resolution]
-  B --> C[TCP/IP Connection Established]
-  C --> D[Load Balancer / Ingress Controller]
+          <h2 id="how-to-handle-market-volatility-rebalance-and-information-gathering-strategies">How to Handle Market Volatility, Rebalance, and Information Gathering Strategies</h2>
+<p>In the face of market volatility and changes in the macro environment, it is essential to stay rational and disciplined. Dynamic rebalancing and information gathering can help optimize investment portfolios. Below are detailed strategies for handling volatility, rebalancing, and information gathering.</p>
+<h3 id="how-to-handle-market-volatility">1. How to Handle Market Volatility</h3>
+<h4 id="maintain-a-long-term-perspective">Maintain a Long-Term Perspective</h4>
+<ul>
+<li>Short-term fluctuations are part of the market; avoid emotional actions based on temporary changes.</li>
+<li>Berkshire Hathaway's investment philosophy—"Be fearful when others are greedy, and greedy when others are fearful"—is a classic rule for managing market volatility.</li>
+</ul>
+<h4 id="dollar-cost-averaging">Dollar-Cost Averaging</h4>
+<ul>
+<li>Invest funds in installments to reduce the risk of a single large investment. Regular investments can help smooth out market fluctuations and lower purchasing costs.</li>
+</ul>
+<h4 id="establish-stop-loss-and-take-profit-mechanisms">Establish Stop-Loss and Take-Profit Mechanisms</h4>
+<ul>
+<li>Set reasonable stop-loss points to limit potential losses.</li>
+<li>Also set take-profit points to ensure gains are realized during market highs.</li>
+</ul>
+<h4 id="risk-balancing">Risk Balancing</h4>
+<ul>
+<li>When market volatility increases, consider adding more bonds or gold as safe-haven assets, reducing the proportion of high-risk assets.</li>
+</ul>
+<h3 id="how-to-rebalance-the-portfolio">2. How to Rebalance the Portfolio</h3>
+<h4 id="set-rebalancing-rules">Set Rebalancing Rules</h4>
+<ul>
+<li><strong>Time-Based Rebalancing:</strong> Rebalance every 6-12 months to restore assets to their original proportions.</li>
+<li><strong>Threshold-Based Rebalancing:</strong> Rebalance when an asset deviates from its original allocation by a certain percentage (e.g., 5%).</li>
+</ul>
+<h4 id="rebalancing-example">Rebalancing Example</h4>
+<ul>
+<li>If Berkshire or the S&amp;P 500 grows too quickly, causing an overweight, sell some gains and increase bonds or emerging market ETFs.</li>
+<li>If the bond proportion rises (reflecting a risk-off sentiment), sell some bonds and increase stock assets to capture potential rebound opportunities.</li>
+</ul>
+<h4 id="staged-rebalancing">Staged Rebalancing</h4>
+<ul>
+<li>Avoid one-time adjustments; instead, rebalance in multiple steps to reduce the impact of major market fluctuations on the overall portfolio.</li>
+</ul>
+<h3 id="how-to-gather-information-for-adjustments">3. How to Gather Information for Adjustments</h3>
+<h4 id="track-macroeconomic-data">Track Macroeconomic Data</h4>
+<ul>
+<li>Monitor key indicators like GDP growth, unemployment rate, inflation level, and interest rate decisions.</li>
+<li><strong>Data Sources:</strong> Federal Reserve, European Central Bank, World Bank, IMF.</li>
+<li>Increase bond allocation when interest rates rise, and stock allocation during economic recovery.</li>
+</ul>
+<h4 id="market-trends-and-industry-analysis">Market Trends and Industry Analysis</h4>
+<ul>
+<li>Regularly review market analysis reports from financial institutions (e.g., Goldman Sachs, JPMorgan) and financial media (e.g., Bloomberg, CNBC).</li>
+<li>Pay attention to policy changes and economic trends in emerging markets (e.g., India) and adjust international ETFs accordingly.</li>
+</ul>
+<h4 id="company-financials-and-business-updates">Company Financials and Business Updates</h4>
+<ul>
+<li>Focus on quarterly reports of Berkshire's investment targets and major S&amp;P 500 companies to determine if individual stocks or ETF holdings need adjustment.</li>
+</ul>
+<h4 id="geopolitical-risks-and-commodity-dynamics">Geopolitical Risks and Commodity Dynamics</h4>
+<ul>
+<li>Monitor geopolitical events, energy prices, and commodity markets; increase gold or other safe-haven assets as needed.</li>
+</ul>
+<h4 id="investment-community-and-expert-insights">Investment Community and Expert Insights</h4>
+<ul>
+<li>Participate in investor communities like Reddit and Seeking Alpha to gauge market sentiment.</li>
+<li>Follow investment gurus like Warren Buffett to learn from their portfolio moves.</li>
+</ul>
+<h4 id="tools-and-platforms">Tools and Platforms</h4>
+<ul>
+<li><strong>Bloomberg, CNBC, Reuters:</strong> Obtain the latest market updates and analysis reports.</li>
+<li><strong>Yahoo Finance, Google Finance:</strong> Monitor the performance of various assets.</li>
+<li><strong>Federal Reserve Website:</strong> Track monetary policy and economic indicators.</li>
+<li><strong>ETF Websites or Fund Manager Reports:</strong> Check ETF investment targets, holdings changes, and market forecasts.</li>
+</ul>
+<h3 id="rebalancing-example-scenario">4. Rebalancing Example Scenario</h3>
+<p><strong>Scenario:</strong> The U.S. economy enters a recession, and market volatility increases. - <strong>Bond ETF (TLT)</strong> prices rise (safe-haven inflows), and the S&amp;P 500 declines.</p>
+<h4 id="rebalancing-strategy">Rebalancing Strategy:</h4>
+<ul>
+<li>Sell some bond ETFs to lock in gains, preparing to buy stocks at lower levels.</li>
+<li>Gradually buy the S&amp;P 500, building positions in installments to capture rebound opportunities.</li>
+<li>Increase gold holdings to hedge against economic uncertainty and dollar depreciation risk.</li>
+</ul>
+<h3 id="conclusion-strategies-for-managing-volatility-with-stability">Conclusion: Strategies for Managing Volatility with Stability</h3>
+<ul>
+<li>Disciplined rebalancing ensures that the portfolio isn’t overly exposed to the fluctuations of a single asset.</li>
+<li>Diversified investment and dynamic rebalancing balance risk and return.</li>
+<li>Timely macro and market information gathering enables flexible adjustments based on real conditions.</li>
+</ul>
+<p>By staying calm and rational, and relying on data-driven decisions, you can manage your portfolio more effectively, navigate market volatility smoothly, and achieve long-term wealth growth goals.</p>
 
-  D --> E[Kubernetes Service]
-  E --> F[Forward Request to Operator Pod]
-
-  subgraph Operator Pod Components
-    F --> G[Operator Manager]
-    G --> H[Controller Watches CRD Changes]
-    H --> I[Reconciliation Loop]
-    I --> J[Current State Assessment]
-    J --> K[Compute Difference]
-    K --> L[Execute Changes to Reach Desired State]
-  end
-
-  I --> Z[Sync State with CRD]
-  L --> Z</pre>
-<p>To understand how an external network request reaches a Kubernetes (k8s) operator and how the operator processes it, we need to dissect the journey step by step, focusing on the underlying mechanisms like TCP/IP, Kubernetes services, Custom Resource Definitions (CRDs), and the internal workings of an operator, including the reconcile loop, managers, and controllers.</p>
-<h3 id="external-request-to-kubernetes-cluster"><strong>1. External Request to Kubernetes Cluster</strong></h3>
-<p>When an external request targets a Kubernetes cluster, it usually hits a <strong>Load Balancer</strong> or an <strong>Ingress Controller</strong> first. The Load Balancer operates at Layer 4 (L4) of the OSI model, dealing with IP addresses and ports, while an Ingress Controller operates at Layer 7 (L7), dealing with HTTP routes.</p>
-<ul>
-<li><strong>DNS Resolution</strong>: The external DNS name, associated with the service, resolves to the IP address of the Load Balancer or the Ingress Controller.</li>
-<li><strong>TCP/IP Connection</strong>: A TCP connection is established between the client and the Load Balancer or Ingress, adhering to the TCP/IP model, which involves SYN, SYN-ACK, and ACK packets to establish a connection.</li>
-</ul>
-<h3 id="routing-to-the-kubernetes-service"><strong>2. Routing to the Kubernetes Service</strong></h3>
-<p>After the initial connection, the request is routed to the appropriate Kubernetes Service.</p>
-<ul>
-<li><strong>Kubernetes Service</strong>: A Kubernetes Service is a REST object in Kubernetes that describes how to access applications, such as the operator's API, inside the cluster. It acts as an internal load balancer. There are different types of Services (e.g., ClusterIP, NodePort(limitation, port 数量有限), LoadBalancer), but typically, for external access, a LoadBalancer or NodePort service in conjunction with Ingress is used.</li>
-</ul>
-<h3 id="accessing-the-operator"><strong>3. Accessing the Operator</strong></h3>
-<p>The Kubernetes Service forwards the request to the <strong>correct pod(s) where the operator is running.</strong> Operators are implemented as a set of pods within the Kubernetes cluster, often deployed and managed via a Deployment.</p>
-<ul>
-<li><strong>TCP Connection to Pod</strong>: Inside the cluster, Kubernetes maintains its <strong>internal networking</strong>, ensuring the service request is forwarded to the <strong>correct pod IP</strong> address, maintaining the TCP connection from the external request.</li>
-</ul>
-<h3 id="operator-components-and-crd"><strong>4. Operator Components and CRD</strong></h3>
-<p>Operators are built on the controller pattern. They watch specific resources in the Kubernetes API, reacting to creation, modification, or deletion of those resources. The core components involved are:</p>
-<ul>
-<li><strong>Custom Resource Definitions (CRDs)</strong>: Operators extend Kubernetes API with CRDs. A CRD allows you to define a Custom Resource (CR), which is a piece of the desired state that the operator manages.</li>
-<li><strong>Manager</strong>: This component is responsible for <strong>registering the operator's controllers</strong> and setting up their <strong>event handlers</strong>. It starts the controller processes.</li>
-<li><strong>Controller</strong>: <strong>Each controller watches for changes</strong> to its specific CRD. It aims to make the current state of the CR match the desired state described by the CR.</li>
-</ul>
-<h3 id="reconciliation-loop"><strong>5. Reconciliation Loop</strong></h3>
-<p>When a controller notices a change to a CRD it manages (or related resources), it triggers the <strong>reconciliation loop</strong>. The reconcile function:</p>
-<ul>
-<li><strong>Reads the current state</strong>: It assesses the current state of the cluster concerning the desired state described by the CRD.</li>
-<li><strong>Compute the difference</strong>: Determines what action(s) must be taken to reach the desired state.</li>
-<li><strong>Execute Changes</strong>: Performs the necessary Kubernetes API calls to bring the current state in line with the desired state. This could involve creating, updating, or deleting Kubernetes resources.</li>
-</ul>
-<h3 id="conclusion"><strong>Conclusion</strong></h3>
-<p>The process starts with a TCP/IP connection from an external network that is routed through a Load Balancer or Ingress to a Kubernetes Service. This service then forwards the request to an operator pod. The operator, through its controller components, watches for CRD changes to trigger a reconciliation loop, ensuring the cluster's state matches the desired state described in CRDs. This involves a deep integration of networking protocols, Kubernetes service mechanisms, and the operator's internal logic for managing resources.</p>
-
+      
     </div>
 
     
     
     
-
       <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/kubernetes/" rel="tag"># kubernetes</a>
-              <a href="/tags/operator/" rel="tag"># operator</a>
-          </div>
-
-        
-
-
-        
-    <div class="post-nav">
-      <div class="post-nav-item">
-    <a href="/2024/10/29/loki_storage_optimization/" rel="prev" title="Loki Storage Optimization">
-      <i class="fa fa-chevron-left"></i> Loki Storage Optimization
-    </a></div>
-      <div class="post-nav-item"></div>
-    </div>
+        <div class="post-eof"></div>
       </footer>
-    
   </article>
   
   
   
+
+
+  
+  <nav class="pagination">
+    <a class="extend prev" rel="prev" href="/"><i class="fa fa-angle-left" aria-label="Previous page"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+  </nav>
 
 
 
@@ -337,7 +354,6 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#external-request-to-kubernetes-cluster"><span class="nav-number">1.</span> <span class="nav-text">1. External Request to Kubernetes Cluster</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#routing-to-the-kubernetes-service"><span class="nav-number">2.</span> <span class="nav-text">2. Routing to the Kubernetes Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#accessing-the-operator"><span class="nav-number">3.</span> <span class="nav-text">3. Accessing the Operator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#operator-components-and-crd"><span class="nav-number">4.</span> <span class="nav-text">4. Operator Components and CRD</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reconciliation-loop"><span class="nav-number">5.</span> <span class="nav-text">5. Reconciliation Loop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#conclusion"><span class="nav-number">6.</span> <span class="nav-text">Conclusion</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
