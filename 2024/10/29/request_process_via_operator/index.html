@@ -20,21 +20,23 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="In an interview for a Go (Golang) developer position, you can expect questions that delve deep into the language&#39;s core features and idioms. Here are some key points and potential questions an intervi">
+  <meta name="description" content="how does the outside (cluster) network request access the k8s operator and final the operator handle the process? answer the process in low level, suck as tcp&#x2F;ip, k8s service mechanism, CRD, operator">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Golang Interview Questions">
-<meta property="og:url" content="http://example.com/2024/10/29/golang_syntax_questions/index.html">
+<meta property="og:title" content="Outside network request access the k8s operator">
+<meta property="og:url" content="http://example.com/2024/10/29/request_process_via_operator/index.html">
 <meta property="og:site_name" content="Justin Shao&#39;s Space">
-<meta property="og:description" content="In an interview for a Go (Golang) developer position, you can expect questions that delve deep into the language&#39;s core features and idioms. Here are some key points and potential questions an intervi">
+<meta property="og:description" content="how does the outside (cluster) network request access the k8s operator and final the operator handle the process? answer the process in low level, suck as tcp&#x2F;ip, k8s service mechanism, CRD, operator">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2024-10-29T12:57:00.000Z">
-<meta property="article:modified_time" content="2024-10-29T13:02:53.524Z">
+<meta property="og:image" content="http://example.com/images/operator_process.png">
+<meta property="article:published_time" content="2024-10-29T14:57:00.000Z">
+<meta property="article:modified_time" content="2024-10-29T15:30:41.423Z">
 <meta property="article:author" content="Justin Shao">
-<meta property="article:tag" content="golang">
-<meta property="article:tag" content="interview">
+<meta property="article:tag" content="kubernetes">
+<meta property="article:tag" content="operator">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/operator_process.png">
 
-<link rel="canonical" href="http://example.com/2024/10/29/golang_syntax_questions/">
+<link rel="canonical" href="http://example.com/2024/10/29/request_process_via_operator/">
 
 
 <script id="page-configurations">
@@ -47,7 +49,7 @@
   };
 </script>
 
-  <title>Golang Interview Questions | Justin Shao's Space</title>
+  <title>Outside network request access the k8s operator | Justin Shao's Space</title>
   
 
 
@@ -162,7 +164,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/golang_syntax_questions/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/request_process_via_operator/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -175,7 +177,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Golang Interview Questions
+          Outside network request access the k8s operator
         </h1>
 
         <div class="post-meta">
@@ -186,7 +188,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2024-10-29 20:57:00 / Modified: 21:02:53" itemprop="dateCreated datePublished" datetime="2024-10-29T20:57:00+08:00">2024-10-29</time>
+              <time title="Created: 2024-10-29 22:57:00 / Modified: 23:30:41" itemprop="dateCreated datePublished" datetime="2024-10-29T22:57:00+08:00">2024-10-29</time>
             </span>
 
           
@@ -200,138 +202,63 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>In an interview for a Go (Golang) developer position, you can expect questions that delve deep into the language's core features and idioms. Here are some key points and potential questions an interviewer might ask:</p>
-<h3 id="concurrency">1. <strong>Concurrency</strong></h3>
+        <p>how does the outside (cluster) network request access the k8s operator and final the operator handle the process? answer the process in low level, suck as tcp/ip, k8s service mechanism, CRD, operator reconcile, manager and controller in operator, etc</p>
+<figure>
+<img src="/images/operator_process.png" alt="operator_process.png" /><figcaption>operator_process.png</figcaption>
+</figure>
+source/images
+<pre class="mermaid">flowchart TD
+  A[External Request] --> B[DNS Resolution]
+  B --> C[TCP/IP Connection Established]
+  C --> D[Load Balancer / Ingress Controller]
+
+  D --> E[Kubernetes Service]
+  E --> F[Forward Request to Operator Pod]
+
+  subgraph Operator Pod Components
+    F --> G[Operator Manager]
+    G --> H[Controller Watches CRD Changes]
+    H --> I[Reconciliation Loop]
+    I --> J[Current State Assessment]
+    J --> K[Compute Difference]
+    K --> L[Execute Changes to Reach Desired State]
+  end
+
+  I --> Z[Sync State with CRD]
+  L --> Z</pre>
+<p>To understand how an external network request reaches a Kubernetes (k8s) operator and how the operator processes it, we need to dissect the journey step by step, focusing on the underlying mechanisms like TCP/IP, Kubernetes services, Custom Resource Definitions (CRDs), and the internal workings of an operator, including the reconcile loop, managers, and controllers.</p>
+<h3 id="external-request-to-kubernetes-cluster"><strong>1. External Request to Kubernetes Cluster</strong></h3>
+<p>When an external request targets a Kubernetes cluster, it usually hits a <strong>Load Balancer</strong> or an <strong>Ingress Controller</strong> first. The Load Balancer operates at Layer 4 (L4) of the OSI model, dealing with IP addresses and ports, while an Ingress Controller operates at Layer 7 (L7), dealing with HTTP routes.</p>
 <ul>
-<li><strong>Goroutines:</strong>
-<ul>
-<li>How do goroutines work in Go?</li>
-<li>What happens if a goroutine panics? How can you handle it?</li>
-<li>Can you explain how to manage goroutines to avoid memory leaks or excessive resource usage?</li>
-</ul></li>
-<li><strong>Channels:</strong>
-<ul>
-<li>How do channels facilitate communication between goroutines? Can you provide an example?</li>
-<li>What is the difference between buffered and unbuffered channels? When would you use each?</li>
-<li>How would you implement a worker pool using goroutines and channels?</li>
-<li>Explain the concept of channel direction and how it’s used in Go.</li>
-<li>How do you handle channel closing, and what are the implications of closing a channel? <span id="more"></span></li>
-</ul></li>
+<li><strong>DNS Resolution</strong>: The external DNS name, associated with the service, resolves to the IP address of the Load Balancer or the Ingress Controller.</li>
+<li><strong>TCP/IP Connection</strong>: A TCP connection is established between the client and the Load Balancer or Ingress, adhering to the TCP/IP model, which involves SYN, SYN-ACK, and ACK packets to establish a connection.</li>
 </ul>
-<h3 id="http-operations">2. <strong>HTTP Operations</strong></h3>
+<h3 id="routing-to-the-kubernetes-service"><strong>2. Routing to the Kubernetes Service</strong></h3>
+<p>After the initial connection, the request is routed to the appropriate Kubernetes Service.</p>
 <ul>
-<li><strong>HTTP Servers:</strong>
-<ul>
-<li>How do you set up an HTTP server in Go?</li>
-<li>Can you describe how to handle different HTTP methods (GET, POST, PUT, DELETE) in Go?</li>
-<li>How do you handle request context and cancellation in an HTTP server?</li>
-</ul></li>
-<li><strong>HTTP Clients:</strong>
-<ul>
-<li>How do you perform HTTP requests in Go using the <code>net/http</code> package?</li>
-<li>How would you handle timeouts and retries when making HTTP requests?</li>
-<li>Can you explain how to manage cookies, headers, and authentication in HTTP requests?</li>
-</ul></li>
+<li><strong>Kubernetes Service</strong>: A Kubernetes Service is a REST object in Kubernetes that describes how to access applications, such as the operator's API, inside the cluster. It acts as an internal load balancer. There are different types of Services (e.g., ClusterIP, NodePort(limitation, port 数量有限), LoadBalancer), but typically, for external access, a LoadBalancer or NodePort service in conjunction with Ingress is used.</li>
 </ul>
-<h3 id="channels">3. <strong>Channels</strong></h3>
+<h3 id="accessing-the-operator"><strong>3. Accessing the Operator</strong></h3>
+<p>The Kubernetes Service forwards the request to the <strong>correct pod(s) where the operator is running.</strong> Operators are implemented as a set of pods within the Kubernetes cluster, often deployed and managed via a Deployment.</p>
 <ul>
-<li><strong>Channel Operations:</strong>
-<ul>
-<li>How do you use <code>select</code> with channels in Go? Can you provide an example?</li>
-<li>What are common pitfalls when working with channels?</li>
-<li>Explain how to use channels for synchronization between goroutines.</li>
-</ul></li>
-<li><strong>Advanced Channel Usage:</strong>
-<ul>
-<li>How can you implement a publish-subscribe pattern using channels?</li>
-<li>How do you implement a rate limiter using channels in Go?</li>
-</ul></li>
+<li><strong>TCP Connection to Pod</strong>: Inside the cluster, Kubernetes maintains its <strong>internal networking</strong>, ensuring the service request is forwarded to the <strong>correct pod IP</strong> address, maintaining the TCP connection from the external request.</li>
 </ul>
-<h3 id="data-structures-usage">4. <strong>Data Structures Usage</strong></h3>
+<h3 id="operator-components-and-crd"><strong>4. Operator Components and CRD</strong></h3>
+<p>Operators are built on the controller pattern. They watch specific resources in the Kubernetes API, reacting to creation, modification, or deletion of those resources. The core components involved are:</p>
 <ul>
-<li><strong>Maps:</strong>
-<ul>
-<li>How do you work with maps in Go? What are their limitations?</li>
-<li>How would you handle concurrent access to a map?</li>
-</ul></li>
-<li><strong>Slices:</strong>
-<ul>
-<li>How do slices differ from arrays in Go?</li>
-<li>Can you explain how slices are internally implemented and how that affects their usage?</li>
-<li>What are some common slice operations, and how do you handle out-of-bounds errors?</li>
-</ul></li>
-<li><strong>Structs:</strong>
-<ul>
-<li>How do you define and use structs in Go?</li>
-<li>Can you explain the concept of embedding in Go structs and its use cases?</li>
-</ul></li>
+<li><strong>Custom Resource Definitions (CRDs)</strong>: Operators extend Kubernetes API with CRDs. A CRD allows you to define a Custom Resource (CR), which is a piece of the desired state that the operator manages.</li>
+<li><strong>Manager</strong>: This component is responsible for <strong>registering the operator's controllers</strong> and setting up their <strong>event handlers</strong>. It starts the controller processes.</li>
+<li><strong>Controller</strong>: <strong>Each controller watches for changes</strong> to its specific CRD. It aims to make the current state of the CR match the desired state described by the CR.</li>
 </ul>
-<h3 id="interface-usage">5. <strong>Interface Usage</strong></h3>
+<h3 id="reconciliation-loop"><strong>5. Reconciliation Loop</strong></h3>
+<p>When a controller notices a change to a CRD it manages (or related resources), it triggers the <strong>reconciliation loop</strong>. The reconcile function:</p>
 <ul>
-<li><strong>Basics:</strong>
-<ul>
-<li>What is an interface in Go, and how is it different from interfaces in other languages like Java or C#?</li>
-<li>How do you implement and use interfaces in Go?</li>
-</ul></li>
-<li><strong>Empty Interface:</strong>
-<ul>
-<li>What is the empty interface (<code>interface&#123;&#125;</code>) in Go, and how is it typically used?</li>
-<li>How do you perform type assertions and type switches on an empty interface?</li>
-</ul></li>
-<li><strong>Interface Design:</strong>
-<ul>
-<li>How do you design and use small, composable interfaces in Go?</li>
-<li>Can you explain the concept of duck typing in Go with respect to interfaces?</li>
-<li>What are the advantages and potential pitfalls of using interfaces in Go?</li>
-</ul></li>
+<li><strong>Reads the current state</strong>: It assesses the current state of the cluster concerning the desired state described by the CRD.</li>
+<li><strong>Compute the difference</strong>: Determines what action(s) must be taken to reach the desired state.</li>
+<li><strong>Execute Changes</strong>: Performs the necessary Kubernetes API calls to bring the current state in line with the desired state. This could involve creating, updating, or deleting Kubernetes resources.</li>
 </ul>
-<h3 id="memory-management">6. <strong>Memory Management</strong></h3>
-<ul>
-<li><strong>Garbage Collection:</strong>
-<ul>
-<li>How does garbage collection work in Go?</li>
-<li>What are some strategies to optimize memory usage in Go?</li>
-</ul></li>
-<li><strong>Escape Analysis:</strong>
-<ul>
-<li>What is escape analysis, and how does it affect memory allocation in Go?</li>
-</ul></li>
-</ul>
-<h3 id="error-handling">7. <strong>Error Handling</strong></h3>
-<ul>
-<li><strong>Idiomatic Error Handling:</strong>
-<ul>
-<li>How is error handling typically done in Go?</li>
-<li>What are the advantages and disadvantages of Go's error handling approach?</li>
-</ul></li>
-<li><strong>Custom Error Types:</strong>
-<ul>
-<li>How do you create and use custom error types in Go?</li>
-<li>How do you implement and handle error wrapping in Go 1.13+?</li>
-</ul>
-<p>### 8. <strong>Go Idioms and Best Practices</strong></p></li>
-<li><strong>Testing:</strong>
-<ul>
-<li>How do you write and structure tests in Go?</li>
-<li>What tools do you use for testing in Go (e.g., <code>testing</code>, <code>testify</code>)?</li>
-</ul></li>
-<li><strong>Code Organization:</strong>
-<ul>
-<li>How do you structure a Go project?</li>
-<li>What are the best practices for managing dependencies in Go (e.g., Go modules)?</li>
-</ul></li>
-</ul>
-<h3 id="advanced-go-concepts">9. <strong>Advanced Go Concepts</strong></h3>
-<ul>
-<li><strong>Reflection:</strong>
-<ul>
-<li>What is reflection in Go, and how can it be used? What are the downsides?</li>
-</ul></li>
-<li><strong>Panic and Recover:</strong>
-<ul>
-<li>How do you handle panics in Go, and when should you use <code>recover</code>?</li>
-</ul></li>
-</ul>
+<h3 id="conclusion"><strong>Conclusion</strong></h3>
+<p>The process starts with a TCP/IP connection from an external network that is routed through a Load Balancer or Ingress to a Kubernetes Service. This service then forwards the request to an operator pod. The operator, through its controller components, watches for CRD changes to trigger a reconciliation loop, ensuring the cluster's state matches the desired state described in CRDs. This involves a deep integration of networking protocols, Kubernetes service mechanisms, and the operator's internal logic for managing resources.</p>
 
     </div>
 
@@ -341,8 +268,8 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/golang/" rel="tag"># golang</a>
-              <a href="/tags/interview/" rel="tag"># interview</a>
+              <a href="/tags/kubernetes/" rel="tag"># kubernetes</a>
+              <a href="/tags/operator/" rel="tag"># operator</a>
           </div>
 
         
@@ -351,13 +278,10 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2024/10/29/goroutine_leak/" rel="prev" title="Goroutine Leaks">
-      <i class="fa fa-chevron-left"></i> Goroutine Leaks
+    <a href="/2024/10/29/monitoring_loki/" rel="prev" title="Monitoring the Loki Logging System">
+      <i class="fa fa-chevron-left"></i> Monitoring the Loki Logging System
     </a></div>
-      <div class="post-nav-item">
-    <a href="/2024/10/29/loki_scalability/" rel="next" title="Loki System Scalability">
-      Loki System Scalability <i class="fa fa-chevron-right"></i>
-    </a></div>
+      <div class="post-nav-item"></div>
     </div>
       </footer>
     
@@ -416,7 +340,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#concurrency"><span class="nav-number">1.</span> <span class="nav-text">1. Concurrency</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#http-operations"><span class="nav-number">2.</span> <span class="nav-text">2. HTTP Operations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#channels"><span class="nav-number">3.</span> <span class="nav-text">3. Channels</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#data-structures-usage"><span class="nav-number">4.</span> <span class="nav-text">4. Data Structures Usage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#interface-usage"><span class="nav-number">5.</span> <span class="nav-text">5. Interface Usage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#memory-management"><span class="nav-number">6.</span> <span class="nav-text">6. Memory Management</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#error-handling"><span class="nav-number">7.</span> <span class="nav-text">7. Error Handling</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#advanced-go-concepts"><span class="nav-number">8.</span> <span class="nav-text">9. Advanced Go Concepts</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#external-request-to-kubernetes-cluster"><span class="nav-number">1.</span> <span class="nav-text">1. External Request to Kubernetes Cluster</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#routing-to-the-kubernetes-service"><span class="nav-number">2.</span> <span class="nav-text">2. Routing to the Kubernetes Service</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#accessing-the-operator"><span class="nav-number">3.</span> <span class="nav-text">3. Accessing the Operator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#operator-components-and-crd"><span class="nav-number">4.</span> <span class="nav-text">4. Operator Components and CRD</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reconciliation-loop"><span class="nav-number">5.</span> <span class="nav-text">5. Reconciliation Loop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#conclusion"><span class="nav-number">6.</span> <span class="nav-text">Conclusion</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

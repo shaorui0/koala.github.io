@@ -155,6 +155,121 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/request_process_via_operator/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/10/29/request_process_via_operator/" class="post-title-link" itemprop="url">Outside network request access the k8s operator</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-10-29 22:57:00 / Modified: 23:30:41" itemprop="dateCreated datePublished" datetime="2024-10-29T22:57:00+08:00">2024-10-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>how does the outside (cluster) network request access the k8s operator and final the operator handle the process? answer the process in low level, suck as tcp/ip, k8s service mechanism, CRD, operator reconcile, manager and controller in operator, etc</p>
+<figure>
+<img src="/images/operator_process.png" alt="operator_process.png" /><figcaption>operator_process.png</figcaption>
+</figure>
+source/images
+<pre class="mermaid">flowchart TD
+  A[External Request] --> B[DNS Resolution]
+  B --> C[TCP/IP Connection Established]
+  C --> D[Load Balancer / Ingress Controller]
+
+  D --> E[Kubernetes Service]
+  E --> F[Forward Request to Operator Pod]
+
+  subgraph Operator Pod Components
+    F --> G[Operator Manager]
+    G --> H[Controller Watches CRD Changes]
+    H --> I[Reconciliation Loop]
+    I --> J[Current State Assessment]
+    J --> K[Compute Difference]
+    K --> L[Execute Changes to Reach Desired State]
+  end
+
+  I --> Z[Sync State with CRD]
+  L --> Z</pre>
+<p>To understand how an external network request reaches a Kubernetes (k8s) operator and how the operator processes it, we need to dissect the journey step by step, focusing on the underlying mechanisms like TCP/IP, Kubernetes services, Custom Resource Definitions (CRDs), and the internal workings of an operator, including the reconcile loop, managers, and controllers.</p>
+<h3 id="external-request-to-kubernetes-cluster"><strong>1. External Request to Kubernetes Cluster</strong></h3>
+<p>When an external request targets a Kubernetes cluster, it usually hits a <strong>Load Balancer</strong> or an <strong>Ingress Controller</strong> first. The Load Balancer operates at Layer 4 (L4) of the OSI model, dealing with IP addresses and ports, while an Ingress Controller operates at Layer 7 (L7), dealing with HTTP routes.</p>
+<ul>
+<li><strong>DNS Resolution</strong>: The external DNS name, associated with the service, resolves to the IP address of the Load Balancer or the Ingress Controller.</li>
+<li><strong>TCP/IP Connection</strong>: A TCP connection is established between the client and the Load Balancer or Ingress, adhering to the TCP/IP model, which involves SYN, SYN-ACK, and ACK packets to establish a connection.</li>
+</ul>
+<h3 id="routing-to-the-kubernetes-service"><strong>2. Routing to the Kubernetes Service</strong></h3>
+<p>After the initial connection, the request is routed to the appropriate Kubernetes Service.</p>
+<ul>
+<li><strong>Kubernetes Service</strong>: A Kubernetes Service is a REST object in Kubernetes that describes how to access applications, such as the operator's API, inside the cluster. It acts as an internal load balancer. There are different types of Services (e.g., ClusterIP, NodePort(limitation, port 数量有限), LoadBalancer), but typically, for external access, a LoadBalancer or NodePort service in conjunction with Ingress is used.</li>
+</ul>
+<h3 id="accessing-the-operator"><strong>3. Accessing the Operator</strong></h3>
+<p>The Kubernetes Service forwards the request to the <strong>correct pod(s) where the operator is running.</strong> Operators are implemented as a set of pods within the Kubernetes cluster, often deployed and managed via a Deployment.</p>
+<ul>
+<li><strong>TCP Connection to Pod</strong>: Inside the cluster, Kubernetes maintains its <strong>internal networking</strong>, ensuring the service request is forwarded to the <strong>correct pod IP</strong> address, maintaining the TCP connection from the external request.</li>
+</ul>
+<h3 id="operator-components-and-crd"><strong>4. Operator Components and CRD</strong></h3>
+<p>Operators are built on the controller pattern. They watch specific resources in the Kubernetes API, reacting to creation, modification, or deletion of those resources. The core components involved are:</p>
+<ul>
+<li><strong>Custom Resource Definitions (CRDs)</strong>: Operators extend Kubernetes API with CRDs. A CRD allows you to define a Custom Resource (CR), which is a piece of the desired state that the operator manages.</li>
+<li><strong>Manager</strong>: This component is responsible for <strong>registering the operator's controllers</strong> and setting up their <strong>event handlers</strong>. It starts the controller processes.</li>
+<li><strong>Controller</strong>: <strong>Each controller watches for changes</strong> to its specific CRD. It aims to make the current state of the CR match the desired state described by the CR.</li>
+</ul>
+<h3 id="reconciliation-loop"><strong>5. Reconciliation Loop</strong></h3>
+<p>When a controller notices a change to a CRD it manages (or related resources), it triggers the <strong>reconciliation loop</strong>. The reconcile function:</p>
+<ul>
+<li><strong>Reads the current state</strong>: It assesses the current state of the cluster concerning the desired state described by the CRD.</li>
+<li><strong>Compute the difference</strong>: Determines what action(s) must be taken to reach the desired state.</li>
+<li><strong>Execute Changes</strong>: Performs the necessary Kubernetes API calls to bring the current state in line with the desired state. This could involve creating, updating, or deleting Kubernetes resources.</li>
+</ul>
+<h3 id="conclusion"><strong>Conclusion</strong></h3>
+<p>The process starts with a TCP/IP connection from an external network that is routed through a Load Balancer or Ingress to a Kubernetes Service. This service then forwards the request to an operator pod. The operator, through its controller components, watches for CRD changes to trigger a reconciliation loop, ensuring the cluster's state matches the desired state described in CRDs. This involves a deep integration of networking protocols, Kubernetes service mechanisms, and the operator's internal logic for managing resources.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/monitoring_loki/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -717,6 +832,112 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/loki_code_hot_seperate/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/10/29/loki_code_hot_seperate/" class="post-title-link" itemprop="url">Loki System Scalability</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-10-29 11:45:00 / Modified: 23:22:45" itemprop="dateCreated datePublished" datetime="2024-10-29T11:45:00+08:00">2024-10-29</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="cold-hot-seperation-in-5g-ran">Cold Hot Seperation in 5G RAN</h2>
+<h3 id="hot-data"><strong>Hot Data</strong></h3>
+<p><strong>Hot data</strong> refers to <strong>frequently accessed</strong> and <strong>low-latency-needed</strong> real-time data, typically involving quick read and write operations. It must be stored on high-performance storage devices (like SSDs or memory) to ensure rapid response and high throughput. In the context of 5G RAN, hot data is crucial because real-time performance directly impacts network quality.</p>
+<h4 id="examples-of-hot-data-in-5g-ran">Examples of Hot Data in 5G RAN:</h4>
+<ol type="1">
+<li><strong>Real-time network monitoring and alarm data</strong>: This includes metrics for monitoring 5G network performance, such as traffic, latency, signal strength, and device connection status. This type of data requires frequent access so operators can make timely adjustments or trigger alarms.</li>
+<li><strong>Real-time RAN configuration parameters</strong>: For example, configuration parameters in 5G base stations (gNB) may need real-time updates and reads to adapt to changing network traffic or user needs.</li>
+<li><strong>Real-time performance indicators (KPIs)</strong>: Indicators such as network throughput and packet loss rate require frequent querying to enable real-time analysis, optimization, or decision-making.</li>
+</ol>
+<h4 id="storage-characteristics-of-hot-data-in-5g-ran">Storage Characteristics of Hot Data in 5G RAN:</h4>
+<ul>
+<li>Stored on high-performance devices like SSDs or DRAM.</li>
+<li>Short data lifecycle with frequent updates.</li>
+<li>High query performance requirements, highly latency-sensitive.</li>
+</ul>
+<h3 id="cold-data"><strong>Cold Data</strong></h3>
+<p><strong>Cold data</strong> refers to <strong>historical data</strong>, typically accessed infrequently or only in specific cases (e.g., audits, historical analysis, trend prediction). Unlike hot data, cold data does not require real-time processing and can be stored on lower-cost, slower storage devices.</p>
+<h4 id="examples-of-cold-data-in-5g-ran">Examples of Cold Data in 5G RAN:</h4>
+<ol type="1">
+<li><strong>Historical network monitoring data</strong>: Data on network status from previous days, weeks, or months, used for trend analysis, troubleshooting, and historical comparisons. Although this data doesn’t require frequent access, it is valuable for debugging and network optimization.</li>
+<li><strong>Historical performance logs</strong>: Historical records of traffic and connection counts. Operators may retain this data for long-term trend analysis or to meet compliance and audit requirements.</li>
+<li><strong>User behavior statistics</strong>: Statistical data on 5G user behavior, such as usage patterns and traffic usage, useful for business decisions and analysis but does not require frequent reads.</li>
+</ol>
+<h3 id="storage-characteristics-of-cold-data-in-5g-ran">Storage Characteristics of Cold Data in 5G RAN:</h3>
+<ul>
+<li>Can be stored on low-cost storage devices like HDDs or object storage (e.g., MinIO, S3).</li>
+<li>Long data lifecycle with low access frequency.</li>
+<li>Lower query performance requirements, higher latency is acceptable.</li>
+</ul>
+<h4 id="criteria-for-hot-and-cold-data-segmentation"><strong>Criteria for Hot and Cold Data Segmentation</strong></h4>
+<p>In the 5G RAN context, hot and cold data are segmented mainly based on <strong>access frequency</strong> and <strong>real-time requirements</strong>:</p>
+<ul>
+<li><strong>Hot data</strong> is typically associated with real-time network monitoring, optimization, and scheduling, requiring quick response.</li>
+<li><strong>Cold data</strong> is generally historical or infrequently accessed data, mainly used for historical analysis, compliance audits, and long-term trend forecasting.</li>
+</ul>
+<h4 id="benefits-of-hot-and-cold-data-separation"><strong>Benefits of Hot and Cold Data Separation</strong></h4>
+<ol type="1">
+<li><strong>Cost Optimization</strong>: Hot data is stored on high-performance, high-cost devices, while cold data is stored on lower-cost storage, greatly reducing storage expenses.</li>
+<li><strong>Performance Improvement</strong>: Storing hot data on high-performance storage ensures fast response times for data with real-time requirements.</li>
+<li><strong>Higher Storage Efficiency</strong>: Cold data is stored in larger-capacity but slower storage, saving space and reducing the burden on hot data storage.</li>
+</ol>
+<h3 id="application-in-5g-ran-scenarios">Application in 5G RAN Scenarios</h3>
+<p>By segmenting logs, monitoring data, and historical performance data in a 5G RAN system, it is possible to achieve:</p>
+<ul>
+<li><strong>Real-time monitoring and response</strong>: Quickly processing high real-time requirement data ensures network stability.</li>
+<li><strong>Long-term data retention and analysis</strong>: Storing historical data in object storage facilitates long-term analysis or compliance while not impacting system performance.</li>
+</ul>
+<p>Hot and cold data separation is an effective strategy in 5G RAN operation and monitoring, optimizing costs while ensuring real-time capabilities and long-term maintainability.</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/28/task_management/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1076,14 +1297,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-count">10</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-count">14</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
