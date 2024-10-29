@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="The design of slices in Go, with distinct concepts of length and capacity, provides a balance between flexibility, performance, and ease of use. Here are some reasons why slices are designed this way:">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Justin Shao&#39;s Space">
+<meta property="og:url" content="http://example.com/recipes/slice.html">
+<meta property="og:site_name" content="Justin Shao&#39;s Space">
+<meta property="og:description" content="The design of slices in Go, with distinct concepts of length and capacity, provides a balance between flexibility, performance, and ease of use. Here are some reasons why slices are designed this way:">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-10-29T12:44:42.044Z">
+<meta property="article:modified_time" content="2024-10-29T12:44:42.044Z">
+<meta property="article:author" content="Justin Shao">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/recipes/slice">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : false,
+    lang   : 'en'
+  };
+</script>
+
+  <title> | Justin Shao's Space
+</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Justin Shao's Space</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+  
+  
+
+          <div class="content page posts-expand">
+            
+
+    
+    
+    
+    <div class="post-block" lang="en">
+      <header class="post-header">
+
+<h1 class="post-title" itemprop="name headline">
+</h1>
+
+<div class="post-meta">
+  
+
+</div>
+
+</header>
+
+      
+      
+      
+      <div class="post-body">
+          <p>The design of slices in Go, with distinct concepts of length and capacity, provides a balance between flexibility, performance, and ease of use. Here are some reasons why slices are designed this way:</p>
+<h3 id="efficiency-and-performance"><strong>1. Efficiency and Performance</strong></h3>
+<ul>
+<li><strong>Memory Allocation</strong>: By separating length and capacity, Go can allocate more memory than is immediately needed. This reduces the number of memory allocations required as the slice grows, which can be a costly operation.</li>
+<li><strong>Amortized Cost</strong>: When you append elements to a slice and it exceeds its capacity, Go allocates a new, larger array and copies the existing elements to it. This reallocation happens less frequently because the capacity is often increased by a factor (e.g., doubled), making the amortized cost of appending elements low.</li>
+</ul>
+<h3 id="flexibility"><strong>2. Flexibility</strong></h3>
+<ul>
+<li><strong>Dynamic Growth</strong>: Slices can grow dynamically as needed. You can start with a small slice and append elements to it without worrying about the underlying array size.</li>
+<li><strong>Preallocation</strong>: If you know the maximum number of elements a slice will need to hold, you can preallocate the capacity to avoid multiple reallocations. This is useful in performance-critical applications.</li>
+</ul>
+<h3 id="ease-of-use"><strong>3. Ease of Use</strong></h3>
+<ul>
+<li><strong>Simplified Syntax</strong>: The <code>make</code> function provides a simple way to create slices with a specified length and capacity. This makes it easy to initialize slices with the desired properties.</li>
+<li><strong>Built-in Functions</strong>: Go provides built-in functions like <code>len</code> and <code>cap</code> to easily retrieve the length and capacity of a slice, making it straightforward to work with slices in a safe and efficient manner.</li>
+</ul>
+<h3 id="safety"><strong>4. Safety</strong></h3>
+<ul>
+<li><strong>Bounds Checking</strong>: The length of a slice determines the range of valid indices, and Go performs bounds checking to prevent out-of-bounds access. This helps catch errors early and improves the safety of the code.</li>
+<li><strong>Zero Value</strong>: The zero value of a slice is <code>nil</code>, which is a valid slice with length and capacity zero. This makes it easy to handle uninitialized slices without special cases.</li>
+</ul>
+<h3 id="consistency-with-arrays"><strong>5. Consistency with Arrays</strong></h3>
+<ul>
+<li><strong>Underlying Array</strong>: Slices are built on top of arrays, providing a more flexible and powerful abstraction. The capacity of a slice corresponds to the size of the underlying array, while the length represents the portion of the array that is currently being used.</li>
+</ul>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> <span class="string">&quot;fmt&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// Create a slice with length 3 and capacity 5</span></span><br><span class="line">    s := <span class="built_in">make</span>([]<span class="keyword">int</span>, <span class="number">3</span>, <span class="number">5</span>)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;Initial slice: len=%d cap=%d %v\n&quot;</span>, <span class="built_in">len</span>(s), <span class="built_in">cap</span>(s), s)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Append elements to the slice</span></span><br><span class="line">    s = <span class="built_in">append</span>(s, <span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;After appending: len=%d cap=%d %v\n&quot;</span>, <span class="built_in">len</span>(s), <span class="built_in">cap</span>(s), s)</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Append more elements to exceed the initial capacity</span></span><br><span class="line">    s = <span class="built_in">append</span>(s, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>)</span><br><span class="line">    fmt.Printf(<span class="string">&quot;After exceeding capacity: len=%d cap=%d %v\n&quot;</span>, <span class="built_in">len</span>(s), <span class="built_in">cap</span>(s), s)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Output:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Initial slice: len=3 cap=5 [0 0 0] After appending: len=5 cap=5 [0 0 0 1 2] After exceeding capacity: len=8 cap=10 [0 0 0 1 2 3 4 5]</span><br></pre></td></tr></table></figure>
+<p>In this example:</p>
+<ul>
+<li>The initial slice has a length of 3 and a capacity of 5.</li>
+<li>After appending two elements, the length increases to 5, but the capacity remains 5.</li>
+<li>After appending more elements to exceed the initial capacity, the slice's capacity is automatically increased to accommodate the new elements.</li>
+</ul>
+
+      </div>
+      
+      
+      
+    </div>
+    
+
+    
+    
+    
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#efficiency-and-performance"><span class="nav-number">1.</span> <span class="nav-text">1. Efficiency and Performance</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#flexibility"><span class="nav-number">2.</span> <span class="nav-text">2. Flexibility</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ease-of-use"><span class="nav-number">3.</span> <span class="nav-text">3. Ease of Use</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#safety"><span class="nav-number">4.</span> <span class="nav-text">4. Safety</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#consistency-with-arrays"><span class="nav-number">5.</span> <span class="nav-text">5. Consistency with Arrays</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Justin Shao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/yourname" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:yourname@gmail.com" title="E-Mail → mailto:yourname@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/yourname" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-weibo fa-fw"></i>Weibo</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://plus.google.com/yourname" title="Google → https:&#x2F;&#x2F;plus.google.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-google fa-fw"></i>Google</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://twitter.com/yourname" title="Twitter → https:&#x2F;&#x2F;twitter.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-twitter fa-fw"></i>Twitter</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://www.facebook.com/yourname" title="FB Page → https:&#x2F;&#x2F;www.facebook.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-facebook fa-fw"></i>FB Page</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://stackoverflow.com/yourname" title="StackOverflow → https:&#x2F;&#x2F;stackoverflow.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-stack-overflow fa-fw"></i>StackOverflow</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://youtube.com/yourname" title="YouTube → https:&#x2F;&#x2F;youtube.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-youtube fa-fw"></i>YouTube</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://instagram.com/yourname" title="Instagram → https:&#x2F;&#x2F;instagram.com&#x2F;yourname" rel="noopener" target="_blank"><i class="fab fa-instagram fa-fw"></i>Instagram</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="skype:yourname?call|chat" title="Skype → skype:yourname?call|chat" rel="noopener" target="_blank"><i class="fab fa-skype fa-fw"></i>Skype</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Justin Shao</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
