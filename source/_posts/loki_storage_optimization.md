@@ -31,7 +31,7 @@ storage_config:
 
 - Reduces local storage pressure by moving historical logs to **object storage**.
 - Improves query performance: prioritizes hot data queries, with slightly higher latency for cold data queries but at lower costs.
-
+<!-- more -->
 ---
 
 ## **2. Compress Logs and Indexes**

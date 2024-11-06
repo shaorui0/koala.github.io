@@ -32,6 +32,7 @@ flowchart TD
 
 To understand how an external network request reaches a Kubernetes (k8s) operator and how the operator processes it, we need to dissect the journey step by step, focusing on the underlying mechanisms like TCP/IP, Kubernetes services, Custom Resource Definitions (CRDs), and the internal workings of an operator, including the reconcile loop, managers, and controllers.
 
+<!-- more -->
 ### **1. External Request to Kubernetes Cluster**
 
 When an external request targets a Kubernetes cluster, it usually hits a **Load Balancer** or an **Ingress Controller** first. The Load Balancer operates at Layer 4 (L4) of the OSI model, dealing with IP addresses and ports, while an Ingress Controller operates at Layer 7 (L7), dealing with HTTP routes.
