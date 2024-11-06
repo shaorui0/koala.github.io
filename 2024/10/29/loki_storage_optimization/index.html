@@ -28,7 +28,7 @@
 <meta property="og:description" content="1. Use Cold&#x2F;Hot Storage Separation Approach:  Hot Data (logs from the last few days or weeks): Stored in fast storage (like SSDs) for frequent access. Cold Data (historical logs): Stored in object sto">
 <meta property="og:locale" content="en_US">
 <meta property="article:published_time" content="2024-10-29T14:30:00.000Z">
-<meta property="article:modified_time" content="2024-10-29T15:45:42.463Z">
+<meta property="article:modified_time" content="2024-11-06T13:41:12.368Z">
 <meta property="article:author" content="Justin Shao">
 <meta property="article:tag" content="loki">
 <meta property="article:tag" content="log">
@@ -186,10 +186,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2024-10-29 22:30:00 / Modified: 23:45:42" itemprop="dateCreated datePublished" datetime="2024-10-29T22:30:00+08:00">2024-10-29</time>
+              <time title="Created: 2024-10-29 22:30:00" itemprop="dateCreated datePublished" datetime="2024-10-29T22:30:00+08:00">2024-10-29</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-11-06 21:41:12" itemprop="dateModified" datetime="2024-11-06T21:41:12+08:00">2024-11-06</time>
+              </span>
 
           
 
@@ -213,9 +219,8 @@
 <h3 id="optimization-effect">Optimization Effect:</h3>
 <ul>
 <li>Reduces local storage pressure by moving historical logs to <strong>object storage</strong>.</li>
-<li>Improves query performance: prioritizes hot data queries, with slightly higher latency for cold data queries but at lower costs.</li>
+<li>Improves query performance: prioritizes hot data queries, with slightly higher latency for cold data queries but at lower costs. <span id="more"></span> ---</li>
 </ul>
-<hr />
 <h2 id="compress-logs-and-indexes"><strong>2. Compress Logs and Indexes</strong></h2>
 <ul>
 <li><strong>Enable Log Compression</strong>: Loki compresses logs by default using chunks, and you can adjust the chunk size and compression level to optimize storage space.</li>
@@ -394,14 +399,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-count">18</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>

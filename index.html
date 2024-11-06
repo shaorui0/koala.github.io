@@ -155,6 +155,104 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/31/todo_kafka_cluster/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/10/31/todo_kafka_cluster/" class="post-title-link" itemprop="url">Kafka cluster networking</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-10-31 11:00:00 / Modified: 19:52:47" itemprop="dateCreated datePublished" datetime="2024-10-31T11:00:00+08:00">2024-10-31</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <pre class="mermaid">graph TB
+    subgraph "Kafka Cluster"
+        Broker1["Broker 1"]
+        Broker2["Broker 2"]
+        Broker3["Broker 3"]
+    end
+
+    subgraph "Topic: my-topic (3 Partitions)"
+        P0["Partition 0"]
+        P1["Partition 1"]
+        P2["Partition 2"]
+    end
+
+    P0 --> LeaderP0["Leader (Broker 1)"]
+    P0 --> FollowerP0_B2["Follower (Broker 2)"]
+    P0 --> FollowerP0_B3["Follower (Broker 3)"]
+
+    P1 --> LeaderP1["Leader (Broker 2)"]
+    P1 --> FollowerP1_B3["Follower (Broker 3)"]
+    P1 --> FollowerP1_B1["Follower (Broker 1)"]
+
+    P2 --> LeaderP2["Leader (Broker 3)"]
+    P2 --> FollowerP2_B1["Follower (Broker 1)"]
+    P2 --> FollowerP2_B2["Follower (Broker 2)"]
+
+    Producer["Producer"] -->|Write to Leader| LeaderP0
+    Producer -->|Write to Leader| LeaderP1
+    Producer -->|Write to Leader| LeaderP2
+
+    ConsumerGroup1["Consumer Group 1"] -->|Consume from Partition 0| LeaderP0
+    ConsumerGroup1 -->|Consume from Partition 1| LeaderP1
+    ConsumerGroup1 -->|Consume from Partition 2| LeaderP2
+
+    ConsumerGroup2["Consumer Group 2"] -->|Consume from Partition 0| LeaderP0
+    ConsumerGroup2 -->|Consume from Partition 1| LeaderP1
+    ConsumerGroup2 -->|Consume from Partition 2| LeaderP2
+
+    Zookeeper["ZooKeeper / KRaft"] -->|Manage Metadata & Leader Election| Broker1
+    Zookeeper --> Broker2
+    Zookeeper --> Broker3</pre>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/request_process_via_operator/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -178,10 +276,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2024-10-29 22:57:00 / Modified: 23:31:51" itemprop="dateCreated datePublished" datetime="2024-10-29T22:57:00+08:00">2024-10-29</time>
+              <time title="Created: 2024-10-29 22:57:00" itemprop="dateCreated datePublished" datetime="2024-10-29T22:57:00+08:00">2024-10-29</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-11-06 21:40:52" itemprop="dateModified" datetime="2024-11-06T21:40:52+08:00">2024-11-06</time>
+              </span>
 
           
 
@@ -216,39 +320,14 @@
   I --> Z[Sync State with CRD]
   L --> Z</pre>
 <p>To understand how an external network request reaches a Kubernetes (k8s) operator and how the operator processes it, we need to dissect the journey step by step, focusing on the underlying mechanisms like TCP/IP, Kubernetes services, Custom Resource Definitions (CRDs), and the internal workings of an operator, including the reconcile loop, managers, and controllers.</p>
-<h3 id="external-request-to-kubernetes-cluster"><strong>1. External Request to Kubernetes Cluster</strong></h3>
-<p>When an external request targets a Kubernetes cluster, it usually hits a <strong>Load Balancer</strong> or an <strong>Ingress Controller</strong> first. The Load Balancer operates at Layer 4 (L4) of the OSI model, dealing with IP addresses and ports, while an Ingress Controller operates at Layer 7 (L7), dealing with HTTP routes.</p>
-<ul>
-<li><strong>DNS Resolution</strong>: The external DNS name, associated with the service, resolves to the IP address of the Load Balancer or the Ingress Controller.</li>
-<li><strong>TCP/IP Connection</strong>: A TCP connection is established between the client and the Load Balancer or Ingress, adhering to the TCP/IP model, which involves SYN, SYN-ACK, and ACK packets to establish a connection.</li>
-</ul>
-<h3 id="routing-to-the-kubernetes-service"><strong>2. Routing to the Kubernetes Service</strong></h3>
-<p>After the initial connection, the request is routed to the appropriate Kubernetes Service.</p>
-<ul>
-<li><strong>Kubernetes Service</strong>: A Kubernetes Service is a REST object in Kubernetes that describes how to access applications, such as the operator's API, inside the cluster. It acts as an internal load balancer. There are different types of Services (e.g., ClusterIP, NodePort(limitation, port 数量有限), LoadBalancer), but typically, for external access, a LoadBalancer or NodePort service in conjunction with Ingress is used.</li>
-</ul>
-<h3 id="accessing-the-operator"><strong>3. Accessing the Operator</strong></h3>
-<p>The Kubernetes Service forwards the request to the <strong>correct pod(s) where the operator is running.</strong> Operators are implemented as a set of pods within the Kubernetes cluster, often deployed and managed via a Deployment.</p>
-<ul>
-<li><strong>TCP Connection to Pod</strong>: Inside the cluster, Kubernetes maintains its <strong>internal networking</strong>, ensuring the service request is forwarded to the <strong>correct pod IP</strong> address, maintaining the TCP connection from the external request.</li>
-</ul>
-<h3 id="operator-components-and-crd"><strong>4. Operator Components and CRD</strong></h3>
-<p>Operators are built on the controller pattern. They watch specific resources in the Kubernetes API, reacting to creation, modification, or deletion of those resources. The core components involved are:</p>
-<ul>
-<li><strong>Custom Resource Definitions (CRDs)</strong>: Operators extend Kubernetes API with CRDs. A CRD allows you to define a Custom Resource (CR), which is a piece of the desired state that the operator manages.</li>
-<li><strong>Manager</strong>: This component is responsible for <strong>registering the operator's controllers</strong> and setting up their <strong>event handlers</strong>. It starts the controller processes.</li>
-<li><strong>Controller</strong>: <strong>Each controller watches for changes</strong> to its specific CRD. It aims to make the current state of the CR match the desired state described by the CR.</li>
-</ul>
-<h3 id="reconciliation-loop"><strong>5. Reconciliation Loop</strong></h3>
-<p>When a controller notices a change to a CRD it manages (or related resources), it triggers the <strong>reconciliation loop</strong>. The reconcile function:</p>
-<ul>
-<li><strong>Reads the current state</strong>: It assesses the current state of the cluster concerning the desired state described by the CRD.</li>
-<li><strong>Compute the difference</strong>: Determines what action(s) must be taken to reach the desired state.</li>
-<li><strong>Execute Changes</strong>: Performs the necessary Kubernetes API calls to bring the current state in line with the desired state. This could involve creating, updating, or deleting Kubernetes resources.</li>
-</ul>
-<h3 id="conclusion"><strong>Conclusion</strong></h3>
-<p>The process starts with a TCP/IP connection from an external network that is routed through a Load Balancer or Ingress to a Kubernetes Service. This service then forwards the request to an operator pod. The operator, through its controller components, watches for CRD changes to trigger a reconciliation loop, ensuring the cluster's state matches the desired state described in CRDs. This involves a deep integration of networking protocols, Kubernetes service mechanisms, and the operator's internal logic for managing resources.</p>
-
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/10/29/request_process_via_operator/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -290,10 +369,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">Posted on</span>
-              
 
-              <time title="Created: 2024-10-29 22:30:00 / Modified: 23:45:42" itemprop="dateCreated datePublished" datetime="2024-10-29T22:30:00+08:00">2024-10-29</time>
+              <time title="Created: 2024-10-29 22:30:00" itemprop="dateCreated datePublished" datetime="2024-10-29T22:30:00+08:00">2024-10-29</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2024-11-06 21:41:12" itemprop="dateModified" datetime="2024-11-06T21:41:12+08:00">2024-11-06</time>
+              </span>
 
           
 
@@ -317,88 +402,15 @@
 <h3 id="optimization-effect">Optimization Effect:</h3>
 <ul>
 <li>Reduces local storage pressure by moving historical logs to <strong>object storage</strong>.</li>
-<li>Improves query performance: prioritizes hot data queries, with slightly higher latency for cold data queries but at lower costs.</li>
-</ul>
-<hr />
-<h2 id="compress-logs-and-indexes"><strong>2. Compress Logs and Indexes</strong></h2>
-<ul>
-<li><strong>Enable Log Compression</strong>: Loki compresses logs by default using chunks, and you can adjust the chunk size and compression level to optimize storage space.</li>
-<li><strong>Choose Appropriate Compression Algorithm</strong> (like Snappy or GZIP):</li>
-</ul>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">ingester:</span></span><br><span class="line">  <span class="attr">chunk_encoding:</span> <span class="string">snappy</span>  <span class="comment"># Use Snappy to compress chunks</span></span><br><span class="line">  <span class="attr">chunk_idle_period:</span> <span class="string">5m</span>  <span class="comment"># Set the closing time for idle chunks</span></span><br><span class="line">  <span class="attr">max_chunk_age:</span> <span class="string">1h</span>  <span class="comment"># Maximum lifespan for each chunk</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>Adjust Chunk Size</strong>: Larger chunks can reduce the number of index entries but will increase memory usage. Tune according to log volume and access patterns.</li>
-</ul>
-<hr />
-<h2 id="optimize-index-configuration"><strong>3. Optimize Index Configuration</strong></h2>
-<ul>
-<li><strong>Boltdb-shipper</strong>: It is recommended to use <strong>Boltdb-shipper</strong> to store indexes, reducing reliance on external databases (like Cassandra).</li>
-<li><strong>Reduce the Number of Index Entries</strong>: Lower the index size by disabling unnecessary labels or reducing the number of labels in the Loki configuration:</li>
-</ul>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">limits_config:</span></span><br><span class="line">  <span class="attr">max_label_name_length:</span> <span class="number">1024</span></span><br><span class="line">  <span class="attr">max_label_value_length:</span> <span class="number">2048</span></span><br><span class="line">  <span class="attr">max_streams_per_user:</span> <span class="number">10000</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>Index Granularity Control</strong>: Reducing the frequency of index refreshes can decrease the write pressure on index data:</li>
-</ul>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">schema_config:</span></span><br><span class="line">  <span class="attr">configs:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">from:</span> <span class="number">2023-01-01</span></span><br><span class="line">      <span class="attr">store:</span> <span class="string">boltdb-shipper</span></span><br><span class="line">      <span class="attr">object_store:</span> <span class="string">filesystem</span></span><br><span class="line">      <span class="attr">schema:</span> <span class="string">v11</span></span><br><span class="line">      <span class="attr">index:</span></span><br><span class="line">        <span class="attr">prefix:</span> <span class="string">loki_index_</span></span><br><span class="line">        <span class="attr">period:</span> <span class="string">24h</span>  <span class="comment"># Refresh index every 24 hours</span></span><br></pre></td></tr></table></figure>
-<hr />
-<h2 id="use-object-storage-to-optimize-long-term-storage-minios3"><strong>4. Use Object Storage to Optimize Long-Term Storage (MinIO/S3)</strong></h2>
-<p>If the storage volume for Loki is very large, consider using object storage systems like <strong>MinIO/S3</strong> to lower costs:</p>
-<ul>
-<li><strong>Automatic Migration of Cold/Hot Storage</strong>: Automatically migrate hot data older than a certain time to cold storage.</li>
-<li><strong>Partitioning and Sharding of Object Storage</strong>: Improve read performance in MinIO/S3 through partitioning and sharding.</li>
-</ul>
-<hr />
-<h2 id="sharding-and-partitioning"><strong>5. Sharding and Partitioning</strong></h2>
-<ul>
-<li><strong>Horizontally Scale</strong> Loki's Ingesters, achieving parallel writes and queries through sharding:
-<ul>
-<li>Deploy multiple Ingester replicas, each responsible for different shards.</li>
-</ul></li>
-</ul>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">ingester:</span></span><br><span class="line">  <span class="attr">lifecycler:</span></span><br><span class="line">    <span class="attr">ring:</span></span><br><span class="line">      <span class="attr">replication_factor:</span> <span class="number">3</span>  <span class="comment"># Ensure replicas write to multiple Ingester nodes</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>Optimize Query Performance</strong>: Distribute query requests across multiple Ingesters to enhance concurrent query speed.</li>
-</ul>
-<hr />
-<h2 id="configure-appropriate-retention-policy-log-retention-policy"><strong>6. Configure Appropriate Retention Policy (Log Retention Policy)</strong></h2>
-<ul>
-<li>Set the retention period for logs to timely clean up expired logs and free up storage space:</li>
-</ul>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">limits_config:</span></span><br><span class="line">  <span class="attr">retention_period:</span> <span class="string">30d</span>  <span class="comment"># Retain logs for 30 days</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li>If you need to retain some long-term data, you can combine the layered strategy of object storage to migrate old logs to cold storage.</li>
-</ul>
-<hr />
-<h2 id="optimize-data-transfer-between-promtail-and-loki"><strong>7. Optimize Data Transfer Between Promtail and Loki</strong></h2>
-<ul>
-<li><strong>Enable Batch Sending</strong>: Reduce network overhead and increase throughput:</li>
-</ul>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">clients:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">url:</span> <span class="string">http://loki:3100/loki/api/v1/push</span></span><br><span class="line">    <span class="attr">batchsize:</span> <span class="number">102400</span>  <span class="comment"># Maximum size of each log batch</span></span><br><span class="line">    <span class="attr">batchwait:</span> <span class="string">1s</span>  <span class="comment"># Maximum wait time</span></span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>Use gRPC Compression</strong>: Enable gRPC and Protobuf compression to further reduce the amount of data transferred:</li>
-</ul>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">clients:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">url:</span> <span class="string">grpc://loki:3100</span></span><br><span class="line">    <span class="attr">grpc_compression:</span> <span class="string">snappy</span>  <span class="comment"># Enable Snappy compression</span></span><br></pre></td></tr></table></figure>
-<hr />
-<h2 id="adjust-query-concurrency-and-rate-limiting"><strong>8. Adjust Query Concurrency and Rate Limiting</strong></h2>
-<ul>
-<li>Set query concurrency and rate limits to prevent the Loki cluster from crashing under high query loads:</li>
-</ul>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">limits_config:</span></span><br><span class="line">  <span class="attr">max_concurrent_queries:</span> <span class="number">20</span>  <span class="comment"># Maximum number of concurrent queries</span></span><br><span class="line">  <span class="attr">max_query_timeout:</span> <span class="string">2m</span>  <span class="comment"># Query timeout duration</span></span><br><span class="line">  <span class="attr">max_entries_per_query:</span> <span class="number">5000</span>  <span class="comment"># Maximum number of entries per single query</span></span><br></pre></td></tr></table></figure>
-<hr />
-<h2 id="use-headless-service-to-improve-throughput"><strong>9. Use Headless Service to Improve Throughput</strong></h2>
-<p>In the Loki cluster, use a <strong>Headless Service</strong> to avoid the load balancer becoming a bottleneck:</p>
-<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">loki</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">clusterIP:</span> <span class="string">None</span>  <span class="comment"># Headless Service</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">loki</span></span><br><span class="line">  <span class="attr">ports:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="attr">port:</span> <span class="number">3100</span></span><br><span class="line">      <span class="attr">name:</span> <span class="string">http</span></span><br></pre></td></tr></table></figure>
-<hr />
-<h2 id="summary"><strong>Summary</strong></h2>
-<p>By implementing the above optimization strategies, you can achieve efficient storage and querying in <strong>Loki</strong>, including:</p>
-<ol type="1">
-<li><strong>Cold/Hot Data Layering</strong>: Use MinIO/S3 as cold storage to reduce local storage pressure.</li>
-<li><strong>Compression and Chunk Optimization</strong>: Adjust chunk size and compression algorithms to minimize storage costs.</li>
-<li><strong>Optimize Index Strategies</strong>: Use Boltdb-shipper, and reduce the number of labels and indexing frequency.</li>
-<li><strong>Sharding and Partitioning</strong>: Horizontally scale Ingesters to enhance system throughput.</li>
-<li><strong>Transfer Optimization</strong>: Enable batch sending and gRPC compression to reduce network overhead.</li>
-</ol>
-
+<li>Improves query performance: prioritizes hot data queries, with slightly higher latency for cold data queries but at lower costs.
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2024/10/29/loki_storage_optimization/#more" rel="contents">
+                Read more &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
       
     </div>
 
@@ -1172,65 +1184,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/28/tiktok_print_in_golang/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Justin Shao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Justin Shao's Space">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/10/28/tiktok_print_in_golang/" class="post-title-link" itemprop="url">Tiktok print in Golang</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2024-10-28 10:00:00 / Modified: 22:12:14" itemprop="dateCreated datePublished" datetime="2024-10-28T10:00:00+08:00">2024-10-28</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> main</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> (</span><br><span class="line">	<span class="string">&quot;fmt&quot;</span></span><br><span class="line">	<span class="string">&quot;time&quot;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">	<span class="comment">// Create a channel for synchronization</span></span><br><span class="line">	tikTokChan := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>)</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Start the goroutine for &quot;tik&quot;</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			fmt.Println(<span class="string">&quot;tik&quot;</span>)</span><br><span class="line">			time.Sleep(<span class="number">1</span> * time.Second) <span class="comment">// Wait for 1 second</span></span><br><span class="line">			tikTokChan &lt;- <span class="literal">true</span>          <span class="comment">// Signal the &quot;tok&quot; goroutine</span></span><br><span class="line">			&lt;-tikTokChan                <span class="comment">// Wait for the &quot;tok&quot; goroutine</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	time.Sleep(<span class="number">1</span> * time.Second)</span><br><span class="line">	<span class="comment">// Start the goroutine for &quot;tok&quot;</span></span><br><span class="line">	<span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">		<span class="keyword">for</span> &#123;</span><br><span class="line">			&lt;-tikTokChan                <span class="comment">// Wait for the &quot;tik&quot; goroutine</span></span><br><span class="line">			fmt.Println(<span class="string">&quot;tok&quot;</span>)</span><br><span class="line">			time.Sleep(<span class="number">1</span> * time.Second) <span class="comment">// Wait for 1 second</span></span><br><span class="line">			tikTokChan &lt;- <span class="literal">true</span>          <span class="comment">// Signal the &quot;tik&quot; goroutine</span></span><br><span class="line">		&#125;</span><br><span class="line">	&#125;()</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Use a channel to wait indefinitely or until the program is terminated</span></span><br><span class="line">	forever := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">bool</span>)</span><br><span class="line">	&lt;-forever</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1300,14 +1253,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">11</span>
+          <span class="site-state-item-count">12</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">16</span>
+        <span class="site-state-item-count">18</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
