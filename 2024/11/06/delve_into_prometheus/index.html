@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="1. Introduction to Time Series Data TL;DR Time series data is a sequence of data points collected or recorded at specific time intervals, typically used to track changes or trends over time. Data Sche">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Delve into prometheus">
+<meta property="og:url" content="http://example.com/2024/11/06/delve_into_prometheus/index.html">
+<meta property="og:site_name" content="Justin Shao&#39;s Space">
+<meta property="og:description" content="1. Introduction to Time Series Data TL;DR Time series data is a sequence of data points collected or recorded at specific time intervals, typically used to track changes or trends over time. Data Sche">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-11-06T12:17:00.000Z">
+<meta property="article:modified_time" content="2024-11-06T14:40:35.170Z">
+<meta property="article:author" content="Justin Shao">
+<meta property="article:tag" content="monitoring">
+<meta property="article:tag" content="prometheus">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2024/11/06/delve_into_prometheus/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Delve into prometheus | Justin Shao's Space</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Justin Shao's Space</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/11/06/delve_into_prometheus/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Delve into prometheus
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-11-06 20:17:00 / Modified: 22:40:35" itemprop="dateCreated datePublished" datetime="2024-11-06T20:17:00+08:00">2024-11-06</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="introduction-to-time-series-data">1. Introduction to Time Series Data</h2>
+<p><strong>TL;DR</strong></p>
+<p>Time series data is a sequence of data points collected or recorded at specific time intervals, typically used to track changes or trends over time.</p>
+<p><strong>Data Schema</strong></p>
+<ul>
+<li>Structure: <code>identifier -&gt; (t0, v0), (t1, v1), (t2, v2), ...</code></li>
+</ul>
+<p><strong>Data in Prometheus</strong></p>
+<ul>
+<li>Format: <code>&lt;metric_name&gt;&#123;&lt;label_name&gt;=&lt;label_value&gt;, ...&#125;</code></li>
+</ul>
+<p>Example of a typical set of series identifiers (data model):</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&#123; <span class="attr">&quot;__name__&quot;</span>: <span class="string">&quot;http_requests_total&quot;</span>, <span class="attr">&quot;pod&quot;</span>: <span class="string">&quot;example-pod&quot;</span>, <span class="attr">&quot;job&quot;</span>: <span class="string">&quot;example-job&quot;</span>, <span class="attr">&quot;path&quot;</span>: <span class="string">&quot;/api/v1/resource&quot;</span>, <span class="attr">&quot;status&quot;</span>: <span class="string">&quot;200&quot;</span>, <span class="attr">&quot;method&quot;</span>: <span class="string">&quot;GET&quot;</span>&#125; @<span class="number">1430000000</span> <span class="number">94355</span></span><br><span class="line">&#123; <span class="attr">&quot;__name__&quot;</span>: <span class="string">&quot;http_requests_total&quot;</span>, <span class="attr">&quot;pod&quot;</span>: <span class="string">&quot;example-pod&quot;</span>, <span class="attr">&quot;job&quot;</span>: <span class="string">&quot;example-job&quot;</span>, <span class="attr">&quot;path&quot;</span>: <span class="string">&quot;/api/v1/resource&quot;</span>, <span class="attr">&quot;status&quot;</span>: <span class="string">&quot;200&quot;</span>, <span class="attr">&quot;method&quot;</span>: <span class="string">&quot;PUT&quot;</span>&#125; @<span class="number">1435000000</span> <span class="number">94355</span></span><br><span class="line">&#123; <span class="attr">&quot;__name__&quot;</span>: <span class="string">&quot;http_requests_total&quot;</span>, <span class="attr">&quot;pod&quot;</span>: <span class="string">&quot;example-pod&quot;</span>, <span class="attr">&quot;job&quot;</span>: <span class="string">&quot;example-job&quot;</span>, <span class="attr">&quot;path&quot;</span>: <span class="string">&quot;/api/v1/resource&quot;</span>, <span class="attr">&quot;status&quot;</span>: <span class="string">&quot;200&quot;</span>, <span class="attr">&quot;method&quot;</span>: <span class="string">&quot;POST&quot;</span>&#125; @<span class="number">1439999999</span> <span class="number">94355</span></span><br></pre></td></tr></table></figure>
+<p><strong>Components:</strong></p>
+<ul>
+<li><strong>Key: Series</strong>
+<ul>
+<li><strong>Metric Name:</strong> <code>__name__</code></li>
+<li><p><strong>Labels:</strong></p>
+<p><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;<span class="attr">&quot;pod&quot;</span>: <span class="string">&quot;example-pod&quot;</span>, <span class="attr">&quot;job&quot;</span>: <span class="string">&quot;example-job&quot;</span>, <span class="attr">&quot;path&quot;</span>: <span class="string">&quot;/api/v1/resource&quot;</span>, <span class="attr">&quot;status&quot;</span>: <span class="string">&quot;200&quot;</span>, <span class="attr">&quot;method&quot;</span>: <span class="string">&quot;GET&quot;</span>&#125;</span><br></pre></td></tr></table></figure></p></li>
+<li><strong>Timestamp:</strong> Recorded time of the sample</li>
+</ul></li>
+<li><strong>Value:</strong> Sample value</li>
+</ul>
+<p><strong>How to Query:</strong></p>
+<ul>
+<li>Example Queries:
+<ul>
+<li><code>__name__="http_requests_total"</code> - Selects all series belonging to the <code>http_requests_total</code> metric</li>
+<li><code>method="PUT|POST"</code> - Selects all series where the method is either PUT or POST</li>
+</ul></li>
+</ul>
+<span id="more"></span>
+<h2 id="challenges-in-time-series-storage">2. Challenges in Time Series Storage</h2>
+<h3 id="write-operations">Write Operations</h3>
+<ul>
+<li>Write operations need to efficiently handle high volumes of time-stamped data across multiple series.</li>
+</ul>
+<h3 id="read-operations">Read Operations</h3>
+<ul>
+<li>Querying time series data is often more complex than writing, as it requires accessing specific time ranges and filtering by multiple labels.</li>
+</ul>
+<h3 id="the-fundamental-problem">The Fundamental Problem</h3>
+<ol type="1">
+<li><strong>Storage Issues:</strong>
+<ul>
+<li><strong>IDE Drives</strong>: Slower mechanical rotation limits data speed.</li>
+<li><strong>SSD Drives</strong>: <strong>Issues</strong> with write amplification:
+<ul>
+<li>Small (e.g., 4KB) modifications can result in larger (e.g., 256KB) deletions, affecting longevity and efficiency.</li>
+</ul></li>
+<li><strong>Complex Queries</strong>: Time series queries can cause random reads, reducing performance.</li>
+</ul></li>
+<li><strong>Ideal Read Pattern:</strong> Batch reads for efficiency.</li>
+<li><strong>Ideal Write Pattern:</strong> Sequential writes are optimal, benefiting from disk structure.</li>
+</ol>
+<p>TODO: Define "write amplification"</p>
+<h2 id="prometheus-time-series-storage-solutions">3. Prometheus Time Series Storage Solutions</h2>
+<ul>
+<li><strong>File per Time Series</strong>: Prometheus stores each time series in a separate file, batching 1KiB chunks in memory to optimize performance.</li>
+</ul>
+<p>TODO: Add visual representation (diagram) of Prometheus storage model.</p>
+<p><strong>Challenges ("Dark Side") in Prometheus:</strong></p>
+<ul>
+<li>High disk usage in production</li>
+<li>High memory consumption for indexing</li>
+<li>Series churn due to frequent label changes in high-frequency data</li>
+</ul>
+<h2 id="detailed-components-of-tsdb-in-prometheus">4. Detailed Components of TSDB in Prometheus</h2>
+<h3 id="overview-of-the-file-structure">Overview of the File Structure</h3>
+<p>At the highest level, the Prometheus TSDB (Time Series Database) has a well-defined file structure that organizes time series data for efficient storage and querying. Below is an example of the directory tree:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">data</span><br><span class="line">├── blocks</span><br><span class="line">│   ├── 01FG7C0Q0G3QZ8N1KZ4P1MXY7V</span><br><span class="line">│   │   ├── chunks</span><br><span class="line">│   │   │   ├── 000001</span><br><span class="line">│   │   │   ├── 000002</span><br><span class="line">│   │   │   └── ...</span><br><span class="line">│   │   ├── index</span><br><span class="line">│   │   │   ├── index.db</span><br><span class="line">│   │   │   └── ...</span><br><span class="line">│   │   ├── meta.json</span><br><span class="line">│   │   └── tombstones</span><br><span class="line">│   │       └── tombstones.json</span><br><span class="line">│   └── 01FG7C0Q0G3QZ8N1KZ4P1MXY7W</span><br><span class="line">│       ├── chunks</span><br><span class="line">│       ├── index</span><br><span class="line">│       ├── meta.json</span><br><span class="line">│       └── tombstones</span><br><span class="line">├── chunks_head</span><br><span class="line">│   ├── 000001</span><br><span class="line">│   ├── 000002</span><br><span class="line">│   └── ...</span><br><span class="line">├── index</span><br><span class="line">│   ├── index.db</span><br><span class="line">│   └── ...</span><br><span class="line">├── meta.json</span><br><span class="line">├── lock</span><br><span class="line">└── wal</span><br><span class="line">    ├── 00000001</span><br><span class="line">    ├── 00000002</span><br><span class="line">    └── ...</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="explanation-of-concepts">Explanation of Concepts</h3>
+<ul>
+<li><strong>blocks/</strong>:
+<ul>
+<li><strong>chunks/</strong>: Stores separated chunks of time series data. These files represent compressed segments of data for efficient storage and retrieval.</li>
+<li><strong>index/</strong>: Contains index files like <code>index.db</code>, which are used to accelerate query performance by allowing quick lookup of data points.</li>
+<li><strong>meta.json</strong>: Metadata files that describe each block, including time ranges and configuration details.</li>
+<li><strong>tombstones/</strong>: Holds information about deleted time series. The <code>tombstones.json</code> file records data marked for deletion to manage space and maintain consistency.</li>
+</ul></li>
+<li><strong>chunks_head</strong>: Stores unpacked time series data that resides in memory. Data in this section has not yet been persisted to the <code>blocks/</code> directory.</li>
+<li><strong>index/</strong>: A global index directory containing files for quick querying, such as <code>index.db</code>, which enables efficient data retrieval across multiple series.</li>
+<li><strong>meta.json</strong>: The global metadata file recording the overall status and configuration information of the TSDB.</li>
+<li><strong>lock</strong>: A lock file used to prevent multiple Prometheus instances from accessing the same data folder simultaneously, ensuring data consistency and integrity.</li>
+<li><strong>wal (Write-Ahead Log)</strong>: Stores the most recent write operations to prevent data loss in case of an unexpected crash or power failure. These log files are named sequentially, e.g., <code>00000001</code>, <code>00000002</code>.</li>
+</ul>
+<p><strong>Key Notes</strong>:</p>
+<ul>
+<li>Data is persisted to disk every 2 hours.</li>
+<li>WAL (Write-Ahead Log) is crucial for data recovery.</li>
+<li>The 2-hour block structure allows efficient querying within a specific time range.</li>
+</ul>
+<h3 id="diving-into-the-details">Diving Into the Details</h3>
+<h3 id="block-structure-a-mini-database">Block Structure: A Mini Database</h3>
+<p>Each block in the Prometheus storage system can be seen as a mini database that stores time series data in a structured format. The organization of blocks allows for efficient compression, indexing, and retrieval.</p>
+<h3 id="benefits-of-the-new-design">Benefits of the New Design</h3>
+<p>By restructuring time series storage, Prometheus has improved read and write performance:</p>
+<ol type="1">
+<li><strong>Earlier Design</strong>:
+<ul>
+<li>Each time series was stored in an individual file.</li>
+<li>Querying multiple time series required accessing many separate files, leading to inefficiencies.</li>
+</ul></li>
+<li><strong>New Design</strong>:
+<ul>
+<li>Aggregated data is stored in larger block files, reducing the number of I/O operations.</li>
+<li>Queries involving multiple time series can access contiguous data segments.</li>
+</ul></li>
+</ol>
+<h3 id="data-operations-overview">Data Operations Overview</h3>
+<ul>
+<li><strong>Hot Spot Data</strong>:
+<ul>
+<li>Stored in memory for faster access.</li>
+<li>Frequently queried data remains in the <code>chunks_head</code> section.</li>
+</ul></li>
+<li><strong>Chunk Size</strong>:
+<ul>
+<li>Optimized for efficient storage and quick access.</li>
+</ul></li>
+</ul>
+<p><strong>Thoughts on Data Management</strong>: In computer science, simply storing raw data and processing it in large batches is typically less efficient than using an index combined with raw data. A well-designed data model with smart indexing can greatly enhance the performance and usability of software systems, showcasing the elegance of software architecture.</p>
+<p><strong>Transition from Chunks Head to Blocks</strong>: Data in <code>chunks_head</code> is periodically moved to persistent blocks to reduce memory pressure and ensure data is durable.</p>
+<h2 id="in-depth-key-components-in-prometheus-storage">5. In-Depth: Key Components in Prometheus Storage</h2>
+<h3 id="memory-mapped-files-mmap">Memory-Mapped Files (mmap)</h3>
+<p>Prometheus uses memory-mapped files to efficiently access large blocks of data stored on disk, bridging the gap between memory and storage.</p>
+<h3 id="write-ahead-log-wal">Write-Ahead Log (WAL)</h3>
+<ul>
+<li><strong>Purpose</strong>: Ensures data durability by recording recent writes before they are persisted to block storage. This approach is common in columnar databases to provide high availability (HA) and protect against data loss.</li>
+<li><strong>How It Works</strong>: Recent data writes are stored sequentially in WAL files, enabling efficient recovery after a failure.</li>
+</ul>
+<h3 id="block-compression-techniques">Block Compression Techniques</h3>
+<p>Prometheus employs various compression techniques within its blocks to minimize storage space while maintaining fast data retrieval. The block structure optimizes storage without compromising query speed.</p>
+<p><strong>Indexing and Query Optimization</strong>:</p>
+<ul>
+<li>The index files allow Prometheus to quickly locate samples matching specific label sets.</li>
+<li><strong>Inverted Indexing</strong>: Prometheus uses an inverted index to match label-value pairs efficiently, accelerating join operations and complex queries.</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/monitoring/" rel="tag"># monitoring</a>
+              <a href="/tags/prometheus/" rel="tag"># prometheus</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/11/06/diff_ha_and_reliability/" rel="prev" title="HA v.s. Reliability">
+      <i class="fa fa-chevron-left"></i> HA v.s. Reliability
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#introduction-to-time-series-data"><span class="nav-number">1.</span> <span class="nav-text">1. Introduction to Time Series Data</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#challenges-in-time-series-storage"><span class="nav-number">2.</span> <span class="nav-text">2. Challenges in Time Series Storage</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#write-operations"><span class="nav-number">2.1.</span> <span class="nav-text">Write Operations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#read-operations"><span class="nav-number">2.2.</span> <span class="nav-text">Read Operations</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#the-fundamental-problem"><span class="nav-number">2.3.</span> <span class="nav-text">The Fundamental Problem</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#prometheus-time-series-storage-solutions"><span class="nav-number">3.</span> <span class="nav-text">3. Prometheus Time Series Storage Solutions</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#detailed-components-of-tsdb-in-prometheus"><span class="nav-number">4.</span> <span class="nav-text">4. Detailed Components of TSDB in Prometheus</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#overview-of-the-file-structure"><span class="nav-number">4.1.</span> <span class="nav-text">Overview of the File Structure</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#explanation-of-concepts"><span class="nav-number">4.2.</span> <span class="nav-text">Explanation of Concepts</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#diving-into-the-details"><span class="nav-number">4.3.</span> <span class="nav-text">Diving Into the Details</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#block-structure-a-mini-database"><span class="nav-number">4.4.</span> <span class="nav-text">Block Structure: A Mini Database</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#benefits-of-the-new-design"><span class="nav-number">4.5.</span> <span class="nav-text">Benefits of the New Design</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#data-operations-overview"><span class="nav-number">4.6.</span> <span class="nav-text">Data Operations Overview</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#in-depth-key-components-in-prometheus-storage"><span class="nav-number">5.</span> <span class="nav-text">5. In-Depth: Key Components in Prometheus Storage</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#memory-mapped-files-mmap"><span class="nav-number">5.1.</span> <span class="nav-text">Memory-Mapped Files (mmap)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#write-ahead-log-wal"><span class="nav-number">5.2.</span> <span class="nav-text">Write-Ahead Log (WAL)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#block-compression-techniques"><span class="nav-number">5.3.</span> <span class="nav-text">Block Compression Techniques</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Justin Shao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/shaorui0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;shaorui0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:sr1054461216@gmail.com" title="E-Mail → mailto:sr1054461216@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Justin Shao</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

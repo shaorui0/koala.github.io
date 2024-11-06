@@ -20,21 +20,20 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="graph TB     subgraph &quot;Kafka Cluster&quot;         Broker1[&quot;Broker 1&quot;]         Broker2[&quot;Broker 2&quot;]         Broker3[&quot;Broker 3&quot;]     end      subgraph &quot;Topic: my-topic (3 Partitions)&quot;         P0[&quot;Partition 0">
+  <meta name="description" content="In Kubernetes, the term &quot;reconcile&quot; is used to describe the process by which an operator controller ensures that the current state of a resource matches the desired state specified by the user. The na">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Kafka cluster networking">
-<meta property="og:url" content="http://example.com/2024/10/31/todo_kafka_cluster/index.html">
+<meta property="og:title" content="why the function of controller in kubernete operator is called &quot;reconcile&quot;">
+<meta property="og:url" content="http://example.com/2024/11/06/why_name_reconcile/index.html">
 <meta property="og:site_name" content="Justin Shao&#39;s Space">
-<meta property="og:description" content="graph TB     subgraph &quot;Kafka Cluster&quot;         Broker1[&quot;Broker 1&quot;]         Broker2[&quot;Broker 2&quot;]         Broker3[&quot;Broker 3&quot;]     end      subgraph &quot;Topic: my-topic (3 Partitions)&quot;         P0[&quot;Partition 0">
+<meta property="og:description" content="In Kubernetes, the term &quot;reconcile&quot; is used to describe the process by which an operator controller ensures that the current state of a resource matches the desired state specified by the user. The na">
 <meta property="og:locale" content="en_US">
-<meta property="article:published_time" content="2024-10-31T03:00:00.000Z">
-<meta property="article:modified_time" content="2024-10-31T11:52:47.174Z">
+<meta property="article:published_time" content="2024-11-06T12:17:00.000Z">
+<meta property="article:modified_time" content="2024-11-06T14:37:25.410Z">
 <meta property="article:author" content="Justin Shao">
-<meta property="article:tag" content="distributed system">
-<meta property="article:tag" content="kafka">
+<meta property="article:tag" content="kubernetes">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="http://example.com/2024/10/31/todo_kafka_cluster/">
+<link rel="canonical" href="http://example.com/2024/11/06/why_name_reconcile/">
 
 
 <script id="page-configurations">
@@ -47,7 +46,7 @@
   };
 </script>
 
-  <title>Kafka cluster networking | Justin Shao's Space</title>
+  <title>why the function of controller in kubernete operator is called "reconcile" | Justin Shao's Space</title>
   
 
 
@@ -162,7 +161,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/31/todo_kafka_cluster/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/11/06/why_name_reconcile/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -175,7 +174,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Kafka cluster networking
+          why the function of controller in kubernete operator is called "reconcile"
         </h1>
 
         <div class="post-meta">
@@ -186,7 +185,7 @@
               <span class="post-meta-item-text">Posted on</span>
               
 
-              <time title="Created: 2024-10-31 11:00:00 / Modified: 19:52:47" itemprop="dateCreated datePublished" datetime="2024-10-31T11:00:00+08:00">2024-10-31</time>
+              <time title="Created: 2024-11-06 20:17:00 / Modified: 22:37:25" itemprop="dateCreated datePublished" datetime="2024-11-06T20:17:00+08:00">2024-11-06</time>
             </span>
 
           
@@ -200,46 +199,100 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <pre class="mermaid">graph TB
-    subgraph "Kafka Cluster"
-        Broker1["Broker 1"]
-        Broker2["Broker 2"]
-        Broker3["Broker 3"]
-    end
-
-    subgraph "Topic: my-topic (3 Partitions)"
-        P0["Partition 0"]
-        P1["Partition 1"]
-        P2["Partition 2"]
-    end
-
-    P0 --> LeaderP0["Leader (Broker 1)"]
-    P0 --> FollowerP0_B2["Follower (Broker 2)"]
-    P0 --> FollowerP0_B3["Follower (Broker 3)"]
-
-    P1 --> LeaderP1["Leader (Broker 2)"]
-    P1 --> FollowerP1_B3["Follower (Broker 3)"]
-    P1 --> FollowerP1_B1["Follower (Broker 1)"]
-
-    P2 --> LeaderP2["Leader (Broker 3)"]
-    P2 --> FollowerP2_B1["Follower (Broker 1)"]
-    P2 --> FollowerP2_B2["Follower (Broker 2)"]
-
-    Producer["Producer"] -->|Write to Leader| LeaderP0
-    Producer -->|Write to Leader| LeaderP1
-    Producer -->|Write to Leader| LeaderP2
-
-    ConsumerGroup1["Consumer Group 1"] -->|Consume from Partition 0| LeaderP0
-    ConsumerGroup1 -->|Consume from Partition 1| LeaderP1
-    ConsumerGroup1 -->|Consume from Partition 2| LeaderP2
-
-    ConsumerGroup2["Consumer Group 2"] -->|Consume from Partition 0| LeaderP0
-    ConsumerGroup2 -->|Consume from Partition 1| LeaderP1
-    ConsumerGroup2 -->|Consume from Partition 2| LeaderP2
-
-    Zookeeper["ZooKeeper / KRaft"] -->|Manage Metadata & Leader Election| Broker1
-    Zookeeper --> Broker2
-    Zookeeper --> Broker3</pre>
+        <p>In Kubernetes, the term "reconcile" is used to describe the process by which an operator controller ensures that the current state of a resource matches the desired state specified by the user.</p>
+<p>The name "reconcile" is derived from the concept of reconciliation, which means to make consistent or congruent.</p>
+<ol type="1">
+<li><strong>Desired State vs. Current State</strong>:
+<ul>
+<li>Kubernetes operates on a declarative model where users specify the desired state of the system using YAML or JSON manifests.</li>
+<li>The actual state of the system is the current state of the resources as observed in the cluster.</li>
+</ul></li>
+<li><strong>Reconciliation Loop</strong>:
+<ul>
+<li>The core responsibility of a Kubernetes controller (including operators) is to continuously monitor the current state of resources and compare it with the desired state.</li>
+<li>If there is a discrepancy between the desired state and the current state, the controller takes actions to bring the current state in line with the desired state. This process is known as reconciliation.</li>
+</ul></li>
+<li><strong>Reconcile Function</strong>:
+<ul>
+<li>The "reconcile" function is the heart of this process. It is called whenever there is a change in the resource or periodically to ensure the desired state is maintained.</li>
+<li>The function typically involves reading the current state of the resource, comparing it with the desired state, and then performing the necessary operations (such as creating, updating, or deleting resources) to reconcile the two states.</li>
+</ul></li>
+<li><strong>Idempotency</strong>:
+<ul>
+<li>The reconcile function is designed to be idempotent, meaning that running it multiple times with the same input should produce the same result. This ensures that the system remains stable and consistent even if the function is triggered multiple times.</li>
+</ul></li>
+<li><strong>Event-Driven</strong>:
+<ul>
+<li>The reconciliation process is often event-driven. When a resource changes (e.g., a new pod is created, or a deployment is updated), an event is generated, and the reconcile function is triggered to handle the change.</li>
+</ul></li>
+</ol>
+<p>In summary, the name "reconcile" aptly describes the function's role in ensuring that the <strong>actual state</strong> of the system matches the <strong>desired state</strong> as defined by the user. It reflects the continuous and iterative nature of the process, where the controller works to "reconcile" any differences between the two states.</p>
+<pre class="mermaid">graph TD
+    A[User Request] -->|kubectl| B[API Server]
+    B --> C[etcd]
+    B --> D[Controller Manager]
+    D -->|Reconcile Loop| E[Custom Controller]
+    E -->|Check Desired State| F[etcd]
+    E -->|Check Current State| G[API Server]
+    E -->|Update Resources| H[Scheduler]
+    H --> I[Nodes]
+    I -->|Run Pods| J[Actual State]
+    J -->|Report Status| G
+    G -->|Update Status| F
+    F -->|Store State| C</pre>
+<span id="more"></span>
+<h3 id="explanation"><strong>Explanation</strong></h3>
+<ol type="1">
+<li><strong>User Request</strong>:
+<ul>
+<li>The process starts with a user making a request using <code>kubectl</code> to interact with the Kubernetes cluster.</li>
+</ul></li>
+<li><strong>API Server</strong>:
+<ul>
+<li>The <code>kubectl</code> command communicates with the API Server, which is the central management entity of the Kubernetes cluster.</li>
+<li>The API Server processes the request and updates the desired state in <code>etcd</code>.</li>
+</ul></li>
+<li><strong>etcd</strong>:
+<ul>
+<li><code>etcd</code> is the key-value store where Kubernetes stores all its cluster data, including the desired state of the resources.</li>
+</ul></li>
+<li><strong>Controller Manager</strong>:
+<ul>
+<li>The Controller Manager watches the API Server for changes to the desired state and triggers the appropriate controllers to reconcile the state.</li>
+</ul></li>
+<li><strong>Custom Controller</strong>:
+<ul>
+<li>A custom controller (part of the operator) is responsible for reconciling the specific resource.</li>
+<li>It checks the desired state from <code>etcd</code> and the current state from the API Server.</li>
+</ul></li>
+<li><strong>Reconcile Loop</strong>:
+<ul>
+<li>The custom controller enters a reconcile loop where it continuously checks and compares the desired state with the current state.</li>
+</ul></li>
+<li><strong>Scheduler</strong>:
+<ul>
+<li>If the custom controller determines that new pods need to be scheduled, it communicates with the Scheduler.</li>
+<li>The Scheduler assigns the pods to specific nodes based on resource availability and other constraints.</li>
+</ul></li>
+<li><strong>Nodes</strong>:
+<ul>
+<li>The nodes are the worker machines in the Kubernetes cluster where the pods are actually run.</li>
+</ul></li>
+<li><strong>Actual State</strong>:
+<ul>
+<li>The nodes run the pods, and this constitutes the actual state of the system.</li>
+</ul></li>
+<li><strong>Status Reporting</strong>:
+<ul>
+<li>The nodes report the status of the running pods back to the API Server.</li>
+<li>The API Server updates the status in <code>etcd</code>.</li>
+</ul></li>
+<li><strong>State Storage</strong>:
+<ul>
+<li><code>etcd</code> stores the updated state, completing the reconciliation process.</li>
+</ul></li>
+</ol>
+<p>This flow ensures that the Kubernetes cluster continuously works to match the actual state of the system with the desired state as specified by the user.</p>
 
     </div>
 
@@ -249,8 +302,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/distributed-system/" rel="tag"># distributed system</a>
-              <a href="/tags/kafka/" rel="tag"># kafka</a>
+              <a href="/tags/kubernetes/" rel="tag"># kubernetes</a>
           </div>
 
         
@@ -259,12 +311,12 @@
         
     <div class="post-nav">
       <div class="post-nav-item">
-    <a href="/2024/10/29/request_process_via_operator/" rel="prev" title="Outside network request access the k8s operator">
-      <i class="fa fa-chevron-left"></i> Outside network request access the k8s operator
+    <a href="/2024/10/31/todo_kafka_cluster/" rel="prev" title="Kafka cluster networking">
+      <i class="fa fa-chevron-left"></i> Kafka cluster networking
     </a></div>
       <div class="post-nav-item">
-    <a href="/2024/11/06/why_name_reconcile/" rel="next" title="why the function of controller in kubernete operator is called "reconcile"">
-      why the function of controller in kubernete operator is called "reconcile" <i class="fa fa-chevron-right"></i>
+    <a href="/2024/11/06/diff_ha_and_reliability/" rel="next" title="HA v.s. Reliability">
+      HA v.s. Reliability <i class="fa fa-chevron-right"></i>
     </a></div>
     </div>
       </footer>
@@ -324,6 +376,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#explanation"><span class="nav-number">1.</span> <span class="nav-text">Explanation</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 

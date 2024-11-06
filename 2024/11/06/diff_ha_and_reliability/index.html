@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="High Availability (HA) and Reliability are two important concepts in system design, but they address different aspects of system performance and robustness. Below, I&#39;ll provide code examples and expla">
+<meta property="og:type" content="article">
+<meta property="og:title" content="HA v.s. Reliability">
+<meta property="og:url" content="http://example.com/2024/11/06/diff_ha_and_reliability/index.html">
+<meta property="og:site_name" content="Justin Shao&#39;s Space">
+<meta property="og:description" content="High Availability (HA) and Reliability are two important concepts in system design, but they address different aspects of system performance and robustness. Below, I&#39;ll provide code examples and expla">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-11-06T12:17:00.000Z">
+<meta property="article:modified_time" content="2024-11-06T14:36:19.830Z">
+<meta property="article:author" content="Justin Shao">
+<meta property="article:tag" content="distributed system">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2024/11/06/diff_ha_and_reliability/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>HA v.s. Reliability | Justin Shao's Space</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Justin Shao's Space</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/11/06/diff_ha_and_reliability/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          HA v.s. Reliability
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-11-06 20:17:00 / Modified: 22:36:19" itemprop="dateCreated datePublished" datetime="2024-11-06T20:17:00+08:00">2024-11-06</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>High Availability (HA) and Reliability are two important concepts in system design, but they address different aspects of system performance and robustness. Below, I'll provide code examples and explanations to illustrate the differences between HA and Reliability.</p>
+<h3 id="high-availability-ha"><strong>High Availability (HA)</strong></h3>
+<p>High Availability focuses on ensuring that a system is operational and accessible for as much time as possible. This often involves redundancy and failover mechanisms to minimize downtime.</p>
+<h3 id="example-high-availability-with-load-balancer-and-multiple-instances"><strong>Example: High Availability with Load Balancer and Multiple Instances</strong></h3>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">*<span class="comment"># Example using Flask and Gunicorn for a web application# app.py*</span></span><br><span class="line"><span class="keyword">from</span> flask <span class="keyword">import</span> Flask</span><br><span class="line"></span><br><span class="line">app = Flask(__name__)</span><br><span class="line"></span><br><span class="line"><span class="meta">@app.route(<span class="params"><span class="string">&#x27;/&#x27;</span></span>)</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">hello</span>():</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;Hello, World!&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    app.run(host=<span class="string">&#x27;0.0.0.0&#x27;</span>, port=<span class="number">5000</span>)</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">*<span class="comment"># Run multiple instances of the application using Gunicorn*</span></span><br><span class="line">gunicorn -w 4 -b 0.0.0.0:5000 app:app</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="string">*#</span> <span class="string">Example</span> <span class="string">Kubernetes</span> <span class="string">Deployment</span> <span class="string">with</span> <span class="string">multiple</span> <span class="string">replicas</span> <span class="string">for</span> <span class="string">HA*</span></span><br><span class="line"></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">apps/v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Deployment</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">my-app</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">replicas:</span> <span class="number">3</span>  <span class="string">*#</span> <span class="string">Multiple</span> <span class="string">replicas</span> <span class="string">for</span> <span class="string">high</span> <span class="string">availability*</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">matchLabels:</span></span><br><span class="line">      <span class="attr">app:</span> <span class="string">my-app</span></span><br><span class="line">  <span class="attr">template:</span></span><br><span class="line">    <span class="attr">metadata:</span></span><br><span class="line">      <span class="attr">labels:</span></span><br><span class="line">        <span class="attr">app:</span> <span class="string">my-app</span></span><br><span class="line">    <span class="attr">spec:</span></span><br><span class="line">      <span class="attr">containers:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">my-app</span></span><br><span class="line">        <span class="attr">image:</span> <span class="string">my-app-image:latest</span></span><br><span class="line">        <span class="attr">ports:</span></span><br><span class="line">        <span class="bullet">-</span> <span class="attr">containerPort:</span> <span class="number">5000</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="string">*#</span> <span class="string">Example</span> <span class="string">Kubernetes</span> <span class="string">Service</span> <span class="string">with</span> <span class="string">LoadBalancer*</span></span><br><span class="line"></span><br><span class="line"><span class="attr">apiVersion:</span> <span class="string">v1</span></span><br><span class="line"><span class="attr">kind:</span> <span class="string">Service</span></span><br><span class="line"><span class="attr">metadata:</span></span><br><span class="line">  <span class="attr">name:</span> <span class="string">my-app-service</span></span><br><span class="line"><span class="attr">spec:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">LoadBalancer</span></span><br><span class="line">  <span class="attr">selector:</span></span><br><span class="line">    <span class="attr">app:</span> <span class="string">my-app</span></span><br><span class="line">  <span class="attr">ports:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">protocol:</span> <span class="string">TCP</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">80</span></span><br><span class="line">    <span class="attr">targetPort:</span> <span class="number">5000</span></span><br></pre></td></tr></table></figure>
+<h3 id="explanation"><strong>Explanation</strong></h3>
+<ul>
+<li><strong>Multiple Instances</strong>: The application is run with multiple instances (replicas) to ensure that if one instance fails, others can continue to serve requests.</li>
+<li><strong>Load Balancer</strong>: A load balancer distributes incoming requests across multiple instances, ensuring that the service remains available even if some instances go down.</li>
+</ul>
+<h3 id="reliability"><strong>Reliability</strong></h3>
+<p>Reliability focuses on ensuring that a system performs its intended function correctly and consistently over time. This often involves error handling, retries, and monitoring to ensure that the system can recover from failures and continue to operate correctly.</p>
+<h3 id="example-reliability-with-error-handling-and-retries"><strong>Example: Reliability with Error Handling and Retries</strong></h3>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="string">import</span> <span class="string">requests</span></span><br><span class="line"><span class="string">from</span> <span class="string">requests.exceptions</span> <span class="string">import</span> <span class="string">RequestException</span></span><br><span class="line"><span class="string">import</span> <span class="string">time</span></span><br><span class="line"></span><br><span class="line"><span class="string">def</span> <span class="string">fetch_data(url,</span> <span class="string">retries=3,</span> <span class="string">delay=2):</span></span><br><span class="line">    <span class="string">for</span> <span class="string">attempt</span> <span class="string">in</span> <span class="string">range(retries):</span></span><br><span class="line">        <span class="attr">try:</span></span><br><span class="line">            <span class="string">response</span> <span class="string">=</span> <span class="string">requests.get(url)</span></span><br><span class="line">            <span class="string">response.raise_for_status()</span></span><br><span class="line">            <span class="string">return</span> <span class="string">response.json()</span></span><br><span class="line">        <span class="attr">except RequestException as e:</span></span><br><span class="line">            <span class="string">print(f&quot;Attempt</span> &#123;<span class="string">attempt</span> <span class="string">+</span> <span class="number">1</span>&#125; <span class="attr">failed:</span> &#123;<span class="string">e</span>&#125;<span class="string">&quot;)</span></span><br><span class="line"><span class="string">            time.sleep(delay)</span></span><br><span class="line"><span class="string">    raise Exception(&quot;</span><span class="string">All</span> <span class="string">retries</span> <span class="string">failed&quot;)</span></span><br><span class="line"></span><br><span class="line"><span class="string">if</span> <span class="string">__name__</span> <span class="string">==</span> <span class="attr">&#x27;__main__&#x27;:</span></span><br><span class="line">    <span class="string">url</span> <span class="string">=</span> <span class="string">&quot;https://api.example.com/data&quot;</span></span><br><span class="line">    <span class="attr">try:</span></span><br><span class="line">        <span class="string">data</span> <span class="string">=</span> <span class="string">fetch_data(url)</span></span><br><span class="line">        <span class="string">print(&quot;Data</span> <span class="string">fetched</span> <span class="string">successfully:&quot;,</span> <span class="string">data)</span></span><br><span class="line">    <span class="attr">except Exception as e:</span></span><br><span class="line">        <span class="string">print(&quot;Failed</span> <span class="string">to</span> <span class="string">fetch</span> <span class="string">data:&quot;,</span> <span class="string">e)</span></span><br></pre></td></tr></table></figure>
+<h3 id="explanation-1"><strong>Explanation</strong></h3>
+<ul>
+<li><strong>Error Handling</strong>: The code includes error handling to catch exceptions that may occur during the HTTP request.</li>
+<li><strong>Retries</strong>: The function <code>fetch_data</code> attempts to fetch data from the URL multiple times (retries) with a delay between attempts. This increases the likelihood of successfully fetching the data even if there are transient issues.</li>
+<li><strong>Monitoring</strong>: Logging the attempts and failures helps in monitoring the reliability of the system.</li>
+</ul>
+<h3 id="summary"><strong>Summary</strong></h3>
+<ul>
+<li><strong>High Availability (HA)</strong>: Ensures that the system is accessible and operational for as much time as possible. This is achieved through redundancy, failover mechanisms, and load balancing.
+<ul>
+<li>High Availability (HA) primarily focuses on <strong>system deployment and architecture design</strong> to ensure that the system is available to external users most of the time. Even if some components fail, users should not perceive any interruption in the system. Below, I will further explain the differences between high availability and reliability, and provide some code examples to illustrate these concepts.</li>
+</ul></li>
+<li><strong>Reliability</strong>: Ensures that the system performs its intended function correctly and consistently over time. This is achieved through error handling, retries, and monitoring.
+<ul>
+<li>Reliability focuses on <strong>the system's ability to correctly and consistently perform its intended functions over a long period of time</strong>. This typically involves error handling, retry mechanisms, and monitoring to ensure that the system can recover from failures and continue to operate normally.</li>
+</ul></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/distributed-system/" rel="tag"># distributed system</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/11/06/why_name_reconcile/" rel="prev" title="why the function of controller in kubernete operator is called "reconcile"">
+      <i class="fa fa-chevron-left"></i> why the function of controller in kubernete operator is called "reconcile"
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/11/06/delve_into_prometheus/" rel="next" title="Delve into prometheus">
+      Delve into prometheus <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#high-availability-ha"><span class="nav-number">1.</span> <span class="nav-text">High Availability (HA)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#example-high-availability-with-load-balancer-and-multiple-instances"><span class="nav-number">2.</span> <span class="nav-text">Example: High Availability with Load Balancer and Multiple Instances</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#explanation"><span class="nav-number">3.</span> <span class="nav-text">Explanation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#reliability"><span class="nav-number">4.</span> <span class="nav-text">Reliability</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#example-reliability-with-error-handling-and-retries"><span class="nav-number">5.</span> <span class="nav-text">Example: Reliability with Error Handling and Retries</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#explanation-1"><span class="nav-number">6.</span> <span class="nav-text">Explanation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#summary"><span class="nav-number">7.</span> <span class="nav-text">Summary</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Justin Shao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/shaorui0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;shaorui0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:sr1054461216@gmail.com" title="E-Mail → mailto:sr1054461216@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Justin Shao</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
