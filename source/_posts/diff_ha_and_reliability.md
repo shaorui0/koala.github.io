@@ -26,6 +26,7 @@ if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
 ```
 
+<!-- more -->
 ```bash
 *# Run multiple instances of the application using Gunicorn*
 gunicorn -w 4 -b 0.0.0.0:5000 app:app
