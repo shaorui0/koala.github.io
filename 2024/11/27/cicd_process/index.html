@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"always","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="graph TD     A[Developer writes and commits code] --&gt; B[Push code to GitHub]     B --&gt; C[GitHub triggers Jenkins via Webhook]     C --&gt; D[Clone repository to Jenkins workspace]     D --&gt; E[Run CI Pipe">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CI&#x2F;CD process">
+<meta property="og:url" content="http://example.com/2024/11/27/cicd_process/index.html">
+<meta property="og:site_name" content="Justin Shao&#39;s Space">
+<meta property="og:description" content="graph TD     A[Developer writes and commits code] --&gt; B[Push code to GitHub]     B --&gt; C[GitHub triggers Jenkins via Webhook]     C --&gt; D[Clone repository to Jenkins workspace]     D --&gt; E[Run CI Pipe">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2024-11-27T14:31:00.000Z">
+<meta property="article:modified_time" content="2024-11-27T15:14:39.288Z">
+<meta property="article:author" content="Justin Shao">
+<meta property="article:tag" content="cicd">
+<meta property="article:tag" content="automation">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2024/11/27/cicd_process/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>CI/CD process | Justin Shao's Space</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Justin Shao's Space</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>About</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>Tags</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/11/27/cicd_process/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          CI/CD process
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-11-27 22:31:00 / Modified: 23:14:39" itemprop="dateCreated datePublished" datetime="2024-11-27T22:31:00+08:00">2024-11-27</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <pre class="mermaid">graph TD
+    A[Developer writes and commits code] --> B[Push code to GitHub]
+    B --> C[GitHub triggers Jenkins via Webhook]
+    C --> D[Clone repository to Jenkins workspace]
+    D --> E[Run CI Pipeline]
+
+    subgraph CI
+        E1[Build Code]
+        E2[Run Unit Tests]
+        E3[Static Code Analysis]
+        E4[Package Build Artifacts]
+    end
+
+    E --> E1 --> E2 --> E3 --> E4 --> F[Store Build Artifacts in Artifact Repository]
+    F --> G[Deploy to Staging Environment]
+
+    subgraph CD
+        G1[Run Smoke Tests]
+        G2[Deploy to Production]
+        G3[Run Acceptance Tests]
+    end
+
+    G --> G1 --> G2 --> G3 --> H[Notify Team of Deployment Status]
+
+    H --> I[Monitor Application Performance]
+    I --> J[Feedback to Development Team]</pre>
+<span id="more"></span>
+<h3 id="code-commit-in-github"><strong>1. Code Commit in GitHub</strong></h3>
+<ul>
+<li><strong>Developer Workflow</strong>:
+<ul>
+<li>A developer writes code on a local machine.</li>
+<li>Before committing, they might run local tests to ensure code quality.</li>
+<li>The developer stages and commits changes to a <strong>Git</strong> repository.</li>
+<li>The changes are then pushed to a <strong>GitHub</strong> repository, typically to a feature branch or directly to the main branch, depending on the workflow.</li>
+</ul></li>
+</ul>
+<h3 id="triggering-jenkins-build"><strong>2. Triggering Jenkins Build</strong></h3>
+<ul>
+<li><strong>Webhooks Setup</strong>:
+<ul>
+<li><strong>GitHub Webhooks</strong> are configured to notify Jenkins of new commits or pull requests.</li>
+<li>Alternatively, Jenkins can be set up to poll the GitHub repository at regular intervals.</li>
+</ul></li>
+<li><strong>Build Trigger</strong>:
+<ul>
+<li>Upon receiving a webhook notification, Jenkins triggers a job or pipeline associated with the repository.</li>
+</ul></li>
+</ul>
+<h3 id="jenkins-pulls-code-from-github"><strong>3. Jenkins Pulls Code from GitHub</strong></h3>
+<ul>
+<li><strong>Source Code Retrieval</strong>:
+<ul>
+<li>Jenkins uses Git plugins to clone the repository or fetch the latest changes.</li>
+<li>It checks out the specific branch or commit that triggered the build.</li>
+</ul></li>
+</ul>
+<h3 id="continuous-integration-stage"><strong>4. Continuous Integration Stage</strong></h3>
+<ul>
+<li><strong>Compilation/Build</strong>:
+<ul>
+<li>Jenkins executes build steps to compile the code.
+<ul>
+<li>For Java projects: uses <strong>Maven</strong> or <strong>Gradle</strong>.</li>
+<li>For Node.js projects: runs <strong>npm install</strong> and <strong>npm build</strong>.</li>
+</ul></li>
+</ul></li>
+<li><strong>Automated Testing</strong>:
+<ul>
+<li><strong>Unit Tests</strong>:
+<ul>
+<li>Runs unit tests using frameworks like <strong>JUnit</strong>, <strong>pytest</strong>, or <strong>Mocha</strong>.</li>
+</ul></li>
+<li><strong>Integration Tests</strong>:
+<ul>
+<li>Tests interactions between different parts of the application.</li>
+</ul></li>
+<li><strong>Code Analysis</strong>:
+<ul>
+<li>Static code analysis using tools like <strong>SonarQube</strong> or <strong>ESLint</strong>.</li>
+<li>Code coverage reports to measure test effectiveness.</li>
+</ul></li>
+</ul></li>
+<li><strong>Build Artifacts</strong>:
+<ul>
+<li>Generates artifacts such as JAR files, Docker images, or binaries.</li>
+<li>Stores artifacts in a repository (e.g., <strong>Nexus</strong>, <strong>Artifactory</strong>, or Docker Registry).</li>
+</ul></li>
+</ul>
+<h3 id="continuous-deploymentdelivery-stage"><strong>5. Continuous Deployment/Delivery Stage</strong></h3>
+<ul>
+<li><strong>Deployment Preparation</strong>:
+<ul>
+<li>Determines the deployment environment based on branch or tag (e.g., develop to staging, main to production).</li>
+<li>Retrieves necessary credentials and configurations securely.</li>
+</ul></li>
+<li><strong>Automated Deployment</strong>:
+<ul>
+<li><strong>For Containers</strong>:
+<ul>
+<li>Builds a <strong>Docker</strong> image with the latest code.</li>
+<li>Pushes the image to a <strong>Docker Registry</strong>.</li>
+<li>Deploys to <strong>Kubernetes</strong> or another container orchestration platform.</li>
+</ul></li>
+<li><strong>For Traditional Servers</strong>:
+<ul>
+<li>Copies build artifacts to servers via <strong>SSH</strong>, <strong>FTP</strong>, or through cloud services.</li>
+<li>Executes deployment scripts to install and start the application.</li>
+</ul></li>
+</ul></li>
+<li><strong>Database Migrations</strong> (if applicable):
+<ul>
+<li>Runs database migration tools like <strong>Flyway</strong> or <strong>Liquibase</strong> to update the database schema.</li>
+</ul></li>
+</ul>
+<h3 id="post-deployment-testing"><strong>6. Post-Deployment Testing</strong></h3>
+<ul>
+<li><strong>Smoke Tests</strong>:
+<ul>
+<li>Quick tests to ensure basic functionality works in the deployed environment.</li>
+</ul></li>
+<li><strong>Acceptance Tests</strong>:
+<ul>
+<li>Runs automated end-to-end tests to validate the application's functionality.</li>
+</ul></li>
+</ul>
+<h3 id="notifications-and-reporting"><strong>7. Notifications and Reporting</strong></h3>
+<ul>
+<li><strong>Build Status Updates</strong>:
+<ul>
+<li>Jenkins updates the build status on GitHub (e.g., passing or failing checks).</li>
+</ul></li>
+<li><strong>Notifications</strong>:
+<ul>
+<li>Sends notifications via email, Slack, or other messaging platforms about build and deployment results.</li>
+</ul></li>
+<li><strong>Reporting</strong>:
+<ul>
+<li>Generates reports for test results, code coverage, and code quality metrics.</li>
+</ul></li>
+</ul>
+<h3 id="monitoring-and-feedback"><strong>8. Monitoring and Feedback</strong></h3>
+<ul>
+<li><strong>Monitoring Tools</strong>:
+<ul>
+<li>Application logs and metrics are collected using tools like <strong>ELK Stack</strong> (Elasticsearch, Logstash, Kibana) or <strong>Prometheus</strong> and <strong>Grafana</strong>.</li>
+</ul></li>
+<li><strong>Feedback Loop</strong>:
+<ul>
+<li>Issues detected in production are fed back to the development team.</li>
+<li>Continuous improvement of the CI/CD pipeline based on feedback.</li>
+</ul></li>
+</ul>
+<h3 id="merge-and-release-management"><strong>9. Merge and Release Management</strong></h3>
+<ul>
+<li><strong>Pull Requests and Code Reviews</strong>:
+<ul>
+<li>Developers create pull requests in GitHub.</li>
+<li>Team members review code changes before merging to the main branch.</li>
+<li>Jenkins can be set up to automatically run tests on pull requests and report back to GitHub.</li>
+</ul></li>
+<li><strong>Release Tagging</strong>:
+<ul>
+<li>Upon successful deployment, GitHub is updated with release tags.</li>
+<li>Release notes may be generated automatically.</li>
+</ul></li>
+</ul>
+<h3 id="rollback-mechanisms"><strong>10. Rollback Mechanisms</strong></h3>
+<ul>
+<li><strong>Failure Handling</strong>:
+<ul>
+<li>If deployment fails or issues are detected, Jenkins can trigger rollback procedures.</li>
+<li>Previous stable versions can be redeployed from stored artifacts.</li>
+</ul></li>
+</ul>
+<hr />
+<h3 id="key-components-and-tools"><strong>Key Components and Tools</strong></h3>
+<ul>
+<li><strong>Jenkins Pipeline</strong>:
+<ul>
+<li>Uses <strong>Declarative</strong> or <strong>Scripted Pipelines</strong> written in Jenkinsfile, stored in the GitHub repository.</li>
+<li>Defines stages (e.g., Build, Test, Deploy) and steps within each stage.</li>
+</ul></li>
+<li><strong>Credentials Management</strong>:
+<ul>
+<li>Sensitive information (e.g., passwords, API keys) is securely stored in Jenkins using <strong>Credentials Plugin</strong>.</li>
+<li>Credentials are injected into the pipeline as needed.</li>
+</ul></li>
+<li><strong>Parallel Execution</strong>:
+<ul>
+<li>Tests and build steps can be run in parallel to speed up the pipeline.</li>
+</ul></li>
+<li><strong>Environment Management</strong>:
+<ul>
+<li>Uses <strong>Jenkins agents</strong> (nodes) to run builds in different environments (e.g., Linux, Windows).</li>
+<li>Docker agents can be used for consistent build environments.</li>
+</ul></li>
+</ul>
+<h3 id="example-jenkinsfile"><strong>Example Jenkinsfile</strong></h3>
+<p>Here's a simplified example of a Jenkinsfile for a Node.js application:</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">pipeline &#123;</span><br><span class="line">    agent any</span><br><span class="line">    stages &#123;</span><br><span class="line">        stage(<span class="string">&#x27;Checkout&#x27;</span>) &#123;</span><br><span class="line">            steps &#123;</span><br><span class="line">                git <span class="string">&#x27;https://github.com/username/repository.git&#x27;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        stage(<span class="string">&#x27;Install Dependencies&#x27;</span>) &#123;</span><br><span class="line">            steps &#123;</span><br><span class="line">                sh <span class="string">&#x27;npm install&#x27;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        stage(<span class="string">&#x27;Run Tests&#x27;</span>) &#123;</span><br><span class="line">            steps &#123;</span><br><span class="line">                sh <span class="string">&#x27;npm test&#x27;</span></span><br><span class="line">            &#125;</span><br><span class="line">            post &#123;</span><br><span class="line">                always &#123;</span><br><span class="line">                    junit <span class="string">&#x27;test-results.xml&#x27;</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        stage(<span class="string">&#x27;Build&#x27;</span>) &#123;</span><br><span class="line">            steps &#123;</span><br><span class="line">                sh <span class="string">&#x27;npm run build&#x27;</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        stage(<span class="string">&#x27;Docker Build and Push&#x27;</span>) &#123;</span><br><span class="line">            steps &#123;</span><br><span class="line">                script &#123;</span><br><span class="line">                    dockerImage = docker.build(<span class="string">&quot;username/repository:$&#123;env.BUILD_NUMBER&#125;&quot;</span>)</span><br><span class="line">                    docker.withRegistry(<span class="string">&#x27;https://registry.hub.docker.com&#x27;</span>, <span class="string">&#x27;dockerhub-credentials&#x27;</span>) &#123;</span><br><span class="line">                        dockerImage.push()</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        stage(<span class="string">&#x27;Deploy to Kubernetes&#x27;</span>) &#123;</span><br><span class="line">            steps &#123;</span><br><span class="line">                withKubeConfig([<span class="attr">credentialsId:</span> <span class="string">&#x27;kubeconfig-credentials&#x27;</span>]) &#123;</span><br><span class="line">                    sh <span class="string">&#x27;kubectl set image deployment/my-app my-app=username/repository:$&#123;env.BUILD_NUMBER&#125;&#x27;</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    post &#123;</span><br><span class="line">        success &#123;</span><br><span class="line">            echo <span class="string">&#x27;Build and deployment succeeded!&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">        failure &#123;</span><br><span class="line">            echo <span class="string">&#x27;Build or deployment failed.&#x27;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="summary"><strong>Summary</strong></h3>
+<ul>
+<li><strong>Continuous Integration</strong>:
+<ul>
+<li>Ensures that code changes are integrated frequently and verified by automated builds and tests.</li>
+</ul></li>
+<li><strong>Continuous Deployment</strong>:
+<ul>
+<li>Automates the release of code to production, allowing for rapid and reliable deployments.</li>
+</ul></li>
+<li><strong>Automation and Collaboration</strong>:
+<ul>
+<li>Jenkins automates the CI/CD pipeline.</li>
+<li>GitHub facilitates collaboration through version control, code reviews, and issue tracking.</li>
+</ul></li>
+</ul>
+<hr />
+<p>By implementing this CI/CD process with Jenkins and GitHub, development teams can:</p>
+<ul>
+<li><strong>Reduce Integration Problems</strong>: Frequent integration helps identify conflicts and issues early.</li>
+<li><strong>Improve Code Quality</strong>: Automated testing and code analysis enforce quality standards.</li>
+<li><strong>Accelerate Deployment</strong>: Automation reduces manual effort and speeds up the release cycle.</li>
+<li><strong>Enhance Collaboration</strong>: Clear processes and feedback loops improve team communication.</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/cicd/" rel="tag"># cicd</a>
+              <a href="/tags/automation/" rel="tag"># automation</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/11/27/shell_commands_table/" rel="prev" title="Shell commands table">
+      <i class="fa fa-chevron-left"></i> Shell commands table
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#code-commit-in-github"><span class="nav-number">1.</span> <span class="nav-text">1. Code Commit in GitHub</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#triggering-jenkins-build"><span class="nav-number">2.</span> <span class="nav-text">2. Triggering Jenkins Build</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#jenkins-pulls-code-from-github"><span class="nav-number">3.</span> <span class="nav-text">3. Jenkins Pulls Code from GitHub</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#continuous-integration-stage"><span class="nav-number">4.</span> <span class="nav-text">4. Continuous Integration Stage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#continuous-deploymentdelivery-stage"><span class="nav-number">5.</span> <span class="nav-text">5. Continuous Deployment&#x2F;Delivery Stage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#post-deployment-testing"><span class="nav-number">6.</span> <span class="nav-text">6. Post-Deployment Testing</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#notifications-and-reporting"><span class="nav-number">7.</span> <span class="nav-text">7. Notifications and Reporting</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#monitoring-and-feedback"><span class="nav-number">8.</span> <span class="nav-text">8. Monitoring and Feedback</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#merge-and-release-management"><span class="nav-number">9.</span> <span class="nav-text">9. Merge and Release Management</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#rollback-mechanisms"><span class="nav-number">10.</span> <span class="nav-text">10. Rollback Mechanisms</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#key-components-and-tools"><span class="nav-number">11.</span> <span class="nav-text">Key Components and Tools</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#example-jenkinsfile"><span class="nav-number">12.</span> <span class="nav-text">Example Jenkinsfile</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#summary"><span class="nav-number">13.</span> <span class="nav-text">Summary</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Justin Shao</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">tags</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/shaorui0" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;shaorui0" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:sr1054461216@gmail.com" title="E-Mail → mailto:sr1054461216@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Justin Shao</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+if (document.querySelectorAll('pre.mermaid').length) {
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mermaid@8/dist/mermaid.min.js', () => {
+    mermaid.initialize({
+      theme    : 'forest',
+      logLevel : 3,
+      flowchart: { curve     : 'linear' },
+      gantt    : { axisFormat: '%m/%d/%Y' },
+      sequence : { actorMargin: 50 }
+    });
+  }, window.mermaid);
+}
+</script>
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
