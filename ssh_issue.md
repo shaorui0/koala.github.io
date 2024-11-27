@@ -1,8 +1,12 @@
+## github issue
+
+## 
 ssh-keygen -t ed25519 -C "sr1054461216@163.com"
 git remote set-url origin git@github.com:shaorui0/shaorui0.github.io.git
 
 cat ~/.ssh/id_ed25519.pub
-
+ 
+# TODO append to github `https://github.com/settings/keys`
 
 ssh -T git@github.com
 
