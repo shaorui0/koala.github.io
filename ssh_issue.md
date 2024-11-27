@@ -1,6 +1,7 @@
 ## github issue
 
-## 
+echo 20.205.243.166  github.com >> /etc/hosts
+
 ssh-keygen -t ed25519 -C "sr1054461216@163.com"
 git remote set-url origin git@github.com:shaorui0/shaorui0.github.io.git
 
