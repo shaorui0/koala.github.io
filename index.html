@@ -155,6 +155,568 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/11/27/shell_commands_table/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Justin Shao">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Justin Shao's Space">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2024/11/27/shell_commands_table/" class="post-title-link" itemprop="url">Shell commands table</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+              
+
+              <time title="Created: 2024-11-27 22:30:00 / Modified: 23:11:41" itemprop="dateCreated datePublished" datetime="2024-11-27T22:30:00+08:00">2024-11-27</time>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th><strong>Category</strong></th>
+<th><strong>Command</strong></th>
+<th><strong>Sub-command</strong></th>
+<th><strong>Description</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>File Operations and Text Processing</strong></td>
+<td><code>cat</code></td>
+<td><code>cat filename</code></td>
+<td>Displays the contents of <code>filename</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>cat file1 file2 &gt; combined_file</code></td>
+<td>Concatenates <code>file1</code> and <code>file2</code> into <code>combined_file</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>grep</code></td>
+<td><code>grep "pattern" file</code></td>
+<td>Searches for "pattern" in <code>file</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>grep -r "pattern" directory/</code></td>
+<td>Recursively searches for "pattern" in <code>directory</code> and its subdirectories.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>grep -i "pattern" file</code></td>
+<td>Searches for "pattern" in <code>file</code> case-insensitively.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>sed</code></td>
+<td><code>sed 's/old/new/g' file</code></td>
+<td>Replaces all occurrences of "old" with "new" in <code>file</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>sed -i '1d' file</code></td>
+<td>Deletes the first line of <code>file</code> in place.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>awk</code></td>
+<td><code>awk -F"\\t" '&#123;print $8&#125;' file</code></td>
+<td>Prints the 8th column of a tab-separated <code>file</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>awk '&#123;sum += $1&#125; END &#123;print sum&#125;' file</code></td>
+<td>Sums the first column of <code>file</code> and prints the total.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>sort</code></td>
+<td><code>sort file</code></td>
+<td>Sorts the lines in <code>file</code> alphabetically.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>sort -t $'\\t' -k 2 file</code></td>
+<td>Sorts <code>file</code> based on the second tab-separated column.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>sort -t $'\\t' -rk 2 file</code></td>
+<td>Sorts <code>file</code> in reverse order based on the second tab-separated column.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>uniq</code></td>
+<td><code>uniq file</code></td>
+<td>Removes duplicate lines from <code>file</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>uniq -c file</code></td>
+<td>Counts the number of occurrences of each line in <code>file</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>split</code></td>
+<td><code>split -l 10000 file.txt</code></td>
+<td>Splits <code>file.txt</code> into smaller files with 10,000 lines each.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>wc</code></td>
+<td><code>wc -l file</code></td>
+<td>Counts the number of lines in <code>file</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>wc -w file</code></td>
+<td>Counts the number of words in <code>file</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>join</code></td>
+<td><code>join file1 file2</code></td>
+<td>Joins lines of <code>file1</code> and <code>file2</code> on a common field.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>head</code></td>
+<td><code>head -n 100 filename</code></td>
+<td>Displays the first 100 lines of <code>filename</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>tail</code></td>
+<td><code>tail -n +1000 filename</code></td>
+<td>Displays lines starting from line 1000 of <code>filename</code>.</td>
+</tr>
+<tr class="odd">
+<td><strong>Data Statistics and Analysis</strong></td>
+<td><code>xargs</code></td>
+<td><code>ls | xargs grep "pattern"</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>tee</code></td>
+<td><code>command | tee file</code></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>command | tee -a file</code></td>
+<td></td>
+</tr>
+<tr class="even">
+<td><strong>Compression and Archiving</strong></td>
+<td><code>gzip</code></td>
+<td><code>gzip filename</code></td>
+<td>Compresses <code>filename</code> using the gzip algorithm.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>gzip -d filename.gz</code></td>
+<td>Decompresses <code>filename.gz</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>tar</code></td>
+<td><code>tar -cvf archive.tar /path/to/directory</code></td>
+<td>Creates a tar archive without compression.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>tar -zcvf archive.tar.gz /path/to/directory</code></td>
+<td>Creates a tar archive with gzip compression.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>tar -xf archive.tar -C /destination</code></td>
+<td>Extracts a tar archive to the specified destination.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>tar -xzf archive.tar.gz -C /destination</code></td>
+<td>Extracts a gzip-compressed tar archive to the specified destination.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>tar -cvf archive.tar /path --exclude=*log* --exclude=*data*</code></td>
+<td>Creates a tar archive while excluding files matching patterns.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>zip</code></td>
+<td><code>zip archive.zip file1 file2</code></td>
+<td>Compresses <code>file1</code> and <code>file2</code> into <code>archive.zip</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>zip -r archive.zip directory/</code></td>
+<td>Recursively compresses <code>directory</code> into <code>archive.zip</code>.</td>
+</tr>
+<tr class="odd">
+<td><strong>Data Flow and Process Management</strong></td>
+<td><code>ps</code></td>
+<td><code>ps aux --sort=-%mem</code></td>
+<td>Lists processes sorted by memory usage.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>ps -ef</code></td>
+<td>Displays all running processes.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>ps -eaf</code></td>
+<td>Another variant to display all processes.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>top</code></td>
+<td><code>top</code></td>
+<td>Displays real-time system processes and resource usage.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>kill</code></td>
+<td><code>kill -9 $pid</code></td>
+<td>Forcefully terminates a process with the specified PID.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>pgrep</code></td>
+<td><code>pgrep process_name</code></td>
+<td>Searches for processes by name and returns their PIDs.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>bg</code></td>
+<td><code>bg %job</code></td>
+<td>Resumes a suspended job in the background.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>jobs</code></td>
+<td><code>jobs</code></td>
+<td>Lists active jobs in the current shell.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>nohup</code></td>
+<td><code>nohup command &gt; output.log 2&gt;&amp;1 &amp;</code></td>
+<td>Runs <code>command</code> immune to hangups, redirecting output to <code>output.log</code> and running it in the background.</td>
+</tr>
+<tr class="even">
+<td><strong>Network and File Transfer</strong></td>
+<td><code>wget</code></td>
+<td><code>wget &lt;http://example.com/file.zip</code>&gt;</td>
+<td>Retrieves <code>file.zip</code> from the specified URL.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>wget -O output.txt &lt;http://example.com/data</code>&gt;</td>
+<td>Downloads data from the specified URL and saves it as <code>output.txt</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>scp</code></td>
+<td><code>scp file.txt user@remote:/path/</code></td>
+<td>Securely copies <code>file.txt</code> to a remote host.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>scp -r /local/dir user@remote:/path/</code></td>
+<td>Securely copies a directory recursively to a remote host.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>netstat</code></td>
+<td><code>netstat -tunpl \| grep [port]</code></td>
+<td>Lists listening ports and associated processes.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>netstat -nap \| grep [pid]</code></td>
+<td>Shows network connections for a specific PID.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>nc</code> (netcat)</td>
+<td><code>nc -zv host port</code></td>
+<td>Scans <code>host</code> on <code>port</code> to check if it's open.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>nc host port</code></td>
+<td>Connects to <code>host</code> on <code>port</code> for data transfer or communication.</td>
+</tr>
+<tr class="even">
+<td><strong>System Information and Monitoring</strong></td>
+<td><code>df</code></td>
+<td><code>df -h</code></td>
+<td>Reports file system disk space usage in a human-readable format.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>df -T</code></td>
+<td>Shows the type of file system.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>du</code></td>
+<td><code>du -h --max-depth=1</code></td>
+<td>Displays disk usage in a human-readable format, limited to one directory level.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>du -sh test_dir</code></td>
+<td>Shows the total disk usage of <code>test_dir</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>iostat</code></td>
+<td><code>iostat</code></td>
+<td>Reports CPU and I/O statistics for devices and partitions.</td>
+</tr>
+<tr class="odd">
+<td><strong>File Search</strong></td>
+<td><code>find</code></td>
+<td><code>find . -name "*.log"</code></td>
+<td>Searches for all <code>.log</code> files in the current directory and subdirectories.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>find /path -type f -size +100M</code></td>
+<td>Finds files larger than 100MB in <code>/path</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>which</code></td>
+<td><code>which gcc</code></td>
+<td>Locates the executable path for <code>gcc</code>.</td>
+</tr>
+<tr class="even">
+<td><strong>Permission Management</strong></td>
+<td><code>chmod</code></td>
+<td><code>chmod u+r file</code></td>
+<td>Adds read permission for the user on <code>file</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>chmod o-r file</code></td>
+<td>Removes read permission for others on <code>file</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>chmod 755 script.sh</code></td>
+<td>Sets permissions to rwxr-xr-x for <code>script.sh</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>chown</code></td>
+<td><code>chown user:group file</code></td>
+<td>Changes ownership of <code>file</code> to <code>user</code> and <code>group</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>chown -R user:group directory/</code></td>
+<td>Recursively changes ownership of <code>directory</code> and its contents to <code>user</code> and <code>group</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>ls -l</code></td>
+<td><code>ls -l</code></td>
+<td>Lists directory contents in long format, showing permissions and ownership.</td>
+</tr>
+<tr class="even">
+<td><strong>Other Tools</strong></td>
+<td><code>env</code></td>
+<td><code>env</code></td>
+<td>Displays the current environment variables.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>env VAR=value command</code></td>
+<td>Sets an environment variable <code>VAR</code> to <code>value</code> for the duration of <code>command</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>date</code></td>
+<td><code>date</code></td>
+<td>Displays the current date and time.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>date +"%Y-%m-%d"</code></td>
+<td>Outputs the date in YYYY-MM-DD format.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>watch</code></td>
+<td><code>watch -n 1 ls</code></td>
+<td>Executes <code>ls</code> every second, updating the display.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td><code>alias</code></td>
+<td><code>alias ll='ls -al'</code></td>
+<td>Creates an alias <code>ll</code> for <code>ls -al</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>alias gs='git status'</code></td>
+<td>Creates an alias <code>gs</code> for <code>git status</code>.</td>
+</tr>
+<tr class="odd">
+<td><strong>Advanced Tools</strong></td>
+<td><code>jq</code></td>
+<td><code>jq '.' file.json</code></td>
+<td>Parses and formats JSON data from <code>file.json</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>jq '.key' file.json</code></td>
+<td>Extracts the value of <code>key</code> from <code>file.json</code>.</td>
+</tr>
+<tr class="odd">
+<td><strong>Network Configuration and Management</strong></td>
+<td><code>netplan</code></td>
+<td><code>netplan apply</code></td>
+<td>Applies the network configuration defined in Netplan YAML files.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>ip</code></td>
+<td><code>ip addr add 10.240.224.117/24 dev ens9f0</code></td>
+<td>Adds an IP address to the network interface <code>ens9f0</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>ip route add default via 10.240.224.1</code></td>
+<td>Adds a default gateway route via <code>10.240.224.1</code>.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td><code>ip a sh dev ens1f0</code></td>
+<td>Shows the address information for the device <code>ens1f0</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>ip l s ens1f0 up</code></td>
+<td>Sets the link state of <code>ens1f0</code> to up.</td>
+</tr>
+<tr class="even">
+<td></td>
+<td><code>ifconfig</code></td>
+<td><code>ifconfig up ens9f0</code></td>
+<td>Brings up the network interface <code>ens9f0</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td><code>ifconfig ens9f0</code></td>
+<td>Displays the configuration of the network interface <code>ens9f0</code>.</td>
+</tr>
+<tr class="even">
+<td><strong>Networking Utilities</strong></td>
+<td><code>nslookup</code></td>
+<td><code>nslookup child-prc.intel.com</code></td>
+<td>Queries DNS to obtain domain name information for <code>child-prc.intel.com</code>.</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/11/06/delve_into_prometheus/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1095,81 +1657,6 @@
   
   
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/10/29/goroutine_leak/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="Justin Shao">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Justin Shao's Space">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/10/29/goroutine_leak/" class="post-title-link" itemprop="url">Goroutine Leaks</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">Posted on</span>
-              
-
-              <time title="Created: 2024-10-29 20:57:00 / Modified: 21:02:49" itemprop="dateCreated datePublished" datetime="2024-10-29T20:57:00+08:00">2024-10-29</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="common-causes-of-goroutine-leaks"><strong>1. Common Causes of Goroutine Leaks</strong></h2>
-<p>Here are the most frequent reasons why goroutines <strong>fail to exit gracefully</strong>, causing leaks:</p>
-<h3 id="blocking-on-channel-operations"><strong>1.1 Blocking on Channel Operations</strong></h3>
-<ul>
-<li>If a goroutine <strong>waits indefinitely</strong> on a channel that no one is writing to, it will never terminate.</li>
-</ul>
-<h3 id="example">Example:</h3>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">leakExample</span><span class="params">()</span></span> &#123;</span><br><span class="line">    ch := <span class="built_in">make</span>(<span class="keyword">chan</span> <span class="keyword">int</span>) <span class="comment">// No writer on the channel.</span></span><br><span class="line">    <span class="keyword">go</span> <span class="function"><span class="keyword">func</span><span class="params">()</span></span> &#123;</span><br><span class="line">        &lt;-ch <span class="comment">// Blocks forever.</span></span><br><span class="line">    &#125;()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><strong>Fix</strong>: Ensure the channel is <strong>closed or written to</strong> in all paths, or use <strong>timeouts</strong> with <code>select</code>.
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2024/10/29/goroutine_leak/#more" rel="contents">
-                Read more &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
 
   
   <nav class="pagination">
@@ -1239,14 +1726,14 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-count">16</span>
           <span class="site-state-item-name">posts</span>
         </a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-count">21</span>
         <span class="site-state-item-name">tags</span></a>
       </div>
   </nav>
